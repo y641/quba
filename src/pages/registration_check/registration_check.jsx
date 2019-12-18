@@ -16,19 +16,71 @@ export default class Index extends Component {
     isLoading: false,
     name: '',
     idcard: '',
-    phone: ''
+    phone: '',
+    appid: '',
+    del: [
+      {
+        text: '取消',
+        style: {
+          backgroundColor: '#6190E8'
+        }
+      },
+      {
+        text: '确认',
+        style: {
+          backgroundColor: '#FF4949'
+        }
+      }
+    ]
   }
   componentWillMount() {
     let info = JSON.parse(this.$router.params.info)
     let money = JSON.parse(this.$router.params.money)
-    this.setState({ getinfo: info, money, name: this.$router.params.name, idcard: this.$router.params.idcard, mobile: this.$router.params.mobile })
+    this.setState({ getinfo: info, money, name: this.$router.params.name, idcard: this.$router.params.idcard, mobile: this.$router.params.mobile, appid: this.$router.params.appid })
   }
   onChange = (value) => {
     this.setState({ current: value })
   }
-  handleClose = () => {  
+  pay = () => {
+    Taro.request({
+      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
+      header: {
+        'Content-Type': 'application/json',
+        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+      },
+      method: 'POST',
+      data: {
+        "hotelGroupCode": "EDBG",
+        "hotelCode": "EDB1",
+        subject: "豪华大床房",
+        masterId: this.state.getinfo.id,
+        totalFee: 0.01,
+        buyerId: this.state.appid
+      },
+      dataType: 'json',
+      success: (res) => {
+        console.log(res, '支付接口')
+        if (res.data && res.data.resultCode === 0) {
+          my.tradePay({
+            tradeNO: res.data.resultInfo,
+            success: (res) => {
+              if (res.result === "" && res.resultCode === '6001') {
+                return
+              } else {
+                Taro.navigateTo({ url: `/pages/success_check/success_check?info=${JSON.stringify(this.state.getinfo)}&name=${this.state.name}&idcard=${this.state.idcard}&mobile=${this.state.mobile}` })
+              }
+            },
+            fail: (res) => {
+            }
+          });
+        } else {
+          Taro.showToast({
+            title: '付款失败'
+          })
+        }
+      }
+    })
   }
-  
   render() {
     const items = [
       { 'title': '房间选择' },
@@ -57,44 +109,27 @@ export default class Index extends Component {
               <View className='check'>离店：{this.state.getinfo.dep}</View>
               <Text className='check'>共{this.state.getinfo.rmnum} 1晚</Text>
             </View>
-            <br />
             <View className='room'>地址：西湖区文三路</View>
           </AtCard>
-          <View className='content'>
+          <View className='at-article'>
             <Text className='person_check'>入住人</Text>
             <Text className='person'>添加同住人</Text>
           </View>
           <View className='line'></View>
-          <AtList>
-          {/* 入住人信息 */}
-            <AtListItem title={this.state.getinfo.rsvMan} />
-            <AtListItem title={`手机号：${this.state.getinfo.mobile}`} />
-            <AtListItem title={`身份证：${this.state.getinfo.idNo}`} />
-          </AtList>
+          <View className='at-article'>
+            <View className='at-article__p'>{this.state.getinfo.name || this.state.getinfo.rsvMan}</View>
+            <View className='at-article__p'>{`手机号：${this.state.getinfo.mobile}`}</View>
+            <View className='at-article__p'>{`身份证：${this.state.getinfo.idNo}`}</View>
+          </View>
           <View className='content'>
             <Text className='person_check'>同住人</Text>
             <View className='line'></View>
           </View>
-          <AtSwipeAction options={[
-            {
-              text: '取消',
-              style: {
-                backgroundColor: '#6190E8'
-              }
-            },
-            {
-              text: '确认',
-              style: {
-                backgroundColor: '#FF4949'
-              }
-            }
-          ]}>
-            <View className='normal'>
-              <AtList>
-                <AtListItem title={this.state.name} />
-                <AtListItem title={`手机号：${this.state.mobile}`} />
-                <AtListItem title={`身份证：${this.state.idcard}`} />
-              </AtList>
+          <AtSwipeAction options={this.state.del}>
+            <View className='at-article'>
+              <View className='at-article__p'>{this.state.name}</View>
+              <View className='at-article__p'>{`手机号：${this.state.mobile}`}</View>
+              <View className='at-article__p'>{`身份证：${this.state.idcard}`}</View>
             </View>
           </AtSwipeAction>
 
@@ -106,18 +141,22 @@ export default class Index extends Component {
               <Text className='money_r'>{`￥${this.state.money.nonPay}`}</Text>
               <Text className='money_t'>明细</Text>
               {this.state.status ? <AtFloatLayout isOpened title="费用明细">
-                <AtList hasBorder={this.state.hasBorder}>
-                  <AtListItem title={this.state.getinfo.arr} extraText={`￥${this.state.money.rmFeeTtl}`} hasBorder={this.state.hasBorder} />
-                  <AtListItem title={this.state.getinfo.dep} extraText={`￥${this.state.money.rmFeeTtl}`} hasBorder={this.state.hasBorder} />
-                  <AtListItem title='押金' extraText={`￥${this.state.money.nonPay}`} hasBorder={this.state.hasBorder} />
-                  <AtListItem title='' extraText={`订单总计：￥${this.state.money.nonPay}`} hasBorder={this.state.hasBorder} />
-                </AtList>
+                <View className='at-row at-row__justify--between'>
+                  <View className='at-col at-col-9'>{this.state.getinfo.arr}</View>
+                  <View className='at-col at-col-2'>{`￥${this.state.money.rmFeeTtl}`}</View>
+                </View>
+                <View className='at-row at-row__justify--between'>
+                  <View className='at-col at-col-9'>{this.state.getinfo.dep}</View>
+                  <View className='at-col at-col-2'>{`￥${this.state.money.rmFeeTtl}`}</View>
+                </View>
+                <View className='at-row at-row__justify--end'>
+                  <View className='at-col at-col-5'></View>
+                  <View className='at-col at-col-5'>{`订单总计：￥${this.state.money.nonPay}`}</View>
+                </View>
               </AtFloatLayout> : null}
             </Text>
             <AtIcon value='chevron-up' size='20' color='#666' className='icon'></AtIcon>
-            <Text className='money_p' onClick={() => {
-             
-            }}>确认登记并支付押金</Text>
+            <Text className='money_p' onClick={this.pay}>确认登记并支付押金</Text>
           </View>
         </View>}
       </View>

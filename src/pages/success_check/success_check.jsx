@@ -1,7 +1,7 @@
-import Taro, { Component} from '@tarojs/taro'
-import { View,Text  } from '@tarojs/components'
+import Taro, { Component } from '@tarojs/taro'
+import { View, Text } from '@tarojs/components'
 import { AtSteps, AtCard, AtList, AtListItem, AtButton } from 'taro-ui'
-import './success.scss'
+import './success_chenck.scss'
 
 export default class Index extends Component {
 
@@ -9,13 +9,13 @@ export default class Index extends Component {
     navigationBarTitleText: '登记确认'
   }
   state = {
-   current: 3,
-   getinfo:null
+    current: 3,
+    getinfo: null
   }
   componentWillMount() {
-   let info = JSON.parse(this.$router.params.info)
-   console.log(info)
-   this.setState({getinfo:info})
+    let info = JSON.parse(this.$router.params.info)
+    console.log(info)
+    this.setState({ getinfo: info })
   }
   onChange = (value) => {
     this.setState({ current: value })
