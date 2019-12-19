@@ -145,8 +145,8 @@ export default class Index extends Component {
         "hotelCode": "EDB1",
         subject: this.state.getinfo.rmtype,
         masterId: this.state.getinfo.id,
-        // totalFee:this.state.money.nonPay,
-        totalFee:0.01,
+        totalFee:this.state.money.nonPay,
+        // totalFee:0.01,
         buyerId: this.state.appid
       },
       dataType: 'json',

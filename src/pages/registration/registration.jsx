@@ -102,6 +102,12 @@ export default class Index extends Component {
         console.log(res, '成员单排房')
         if (res.data && res.data.resultCode === 0) {
           this.checkin()
+        } else {
+          Taro.showToast({
+            title: '已入住状态',
+            icon:'none'
+          })
+          return 
         }
       }
     })
@@ -149,8 +155,8 @@ export default class Index extends Component {
         "hotelCode": "EDB1",
         subject: this.state.getinfo.rmtype,
         masterId: this.state.getinfo.id,
-        // totalFee: this.state.money.nonPay,
-        totalFee:0.01,
+        totalFee: this.state.money.nonPay,
+        // totalFee:0.01,
         buyerId: this.state.appid
       },
       dataType: 'json',
