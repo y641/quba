@@ -69,11 +69,12 @@ export default class Index extends Component {
             title: '无可用房间，请联系酒店前台',
             icon: 'none'
           })
+          return 
         }
       }
     })
   }
-  check = (room) => {
+  check = () => {
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmno/assign',
       header: {
@@ -85,7 +86,7 @@ export default class Index extends Component {
         "hotelGroupCode": "EDBG",
         "hotelCode": "EDB1",
         masterId: this.state.getinfo.id,
-        rmno: this.state.room
+        rmno:this.state.room
       },
       dataType: 'json',
       success: (res) => {
@@ -97,6 +98,7 @@ export default class Index extends Component {
             title: '已入住状态',
             icon: 'none'
           })
+          return
         }
       }
     })
@@ -143,7 +145,8 @@ export default class Index extends Component {
         "hotelCode": "EDB1",
         subject: this.state.getinfo.rmtype,
         masterId: this.state.getinfo.id,
-        totalFee:this.state.money.nonPay,
+        // totalFee:this.state.money.nonPay,
+        totalFee:0.01,
         buyerId: this.state.appid
       },
       dataType: 'json',
@@ -153,12 +156,14 @@ export default class Index extends Component {
           my.tradePay({
             tradeNO: res.data.resultInfo,
             success: (res) => {
-              if (res.result === "" && res.resultCode === '6001') {
-                return
-              } else {
+              console.log(res,'支付接口')
+              if (res.result && res.memo === "") {
                 this.check()
-                // Taro.navigateTo({ url: `/pages/success_check/success_check?info=${JSON.stringify(this.state.getinfo)}&name=${this.state.name}&idcard=${this.state.idcard}&mobile=${this.state.mobile}` })
               }
+              // else {
+              //   this.check()
+              //   // Taro.navigateTo({ url: `/pages/success_check/success_check?info=${JSON.stringify(this.state.getinfo)}&name=${this.state.name}&idcard=${this.state.idcard}&mobile=${this.state.mobile}` })
+              // }
             },
             fail: (res) => {
             }
@@ -245,7 +250,7 @@ export default class Index extends Component {
               </AtFloatLayout> : null}
             </Text>
             <AtIcon value='chevron-up' size='20' color='#666' className='icon'></AtIcon>
-            <Text className='money_p' onClick={this.pay}>确认登记并支付押金</Text>
+            <Text className='money_p' onClick={this.list}>确认登记并支付押金</Text>
           </View>
         </View>}
       </View>

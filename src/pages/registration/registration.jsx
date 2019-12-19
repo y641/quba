@@ -78,11 +78,12 @@ export default class Index extends Component {
             title: '无可用房间，请联系酒店前台',
             icon: 'none'
           })
+          return 
         }
       }
     })
   }
-  check = (room) => {
+  check = () => {
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmno/assign',
       header: {
@@ -101,11 +102,6 @@ export default class Index extends Component {
         console.log(res, '成员单排房')
         if (res.data && res.data.resultCode === 0) {
           this.checkin()
-        } else {
-          Taro.showToast({
-            title: '已入住状态',
-            icon: 'none'
-          })
         }
       }
     })
@@ -135,12 +131,12 @@ export default class Index extends Component {
             title: '入住失败 请联系酒店前台',
             icon: 'none'
           })
+          return 
         }
       }
     })
   }
   pay = () => {
-    // Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
       header: {
@@ -153,7 +149,8 @@ export default class Index extends Component {
         "hotelCode": "EDB1",
         subject: this.state.getinfo.rmtype,
         masterId: this.state.getinfo.id,
-        totalFee: this.state.money.nonPay,
+        // totalFee: this.state.money.nonPay,
+        totalFee:0.01,
         buyerId: this.state.appid
       },
       dataType: 'json',
@@ -164,12 +161,13 @@ export default class Index extends Component {
             tradeNO: res.data.resultInfo,
             success: (res) => {
               console.log(res, '唤起收银台')
-              if (res.result === "" && res.resultCode === '6001') {
-                return
-              } else {
+              if (res.result && res.memo === "") {
                 this.check()
-                // Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
               }
+              // else {
+                
+              //   // Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
+              // }
             },
             fail: (res) => {
             }
@@ -245,7 +243,7 @@ export default class Index extends Component {
               </AtFloatLayout> : null}
             </Text>
             <AtIcon value='chevron-up' size='20' color='#666' className='icon'></AtIcon>
-            <Text className='money_p' onClick={this.pay}>确认登记并支付押金</Text>
+            <Text className='money_p' onClick={this.list}>确认登记并支付押金</Text>
           </View>
         </View>
       </View>

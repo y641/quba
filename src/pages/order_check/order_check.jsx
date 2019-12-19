@@ -23,7 +23,6 @@ export default class Index extends Component {
   onChange = (value) => {
     this.setState({ current: value })
   }
-
   render() {
     const items = [
       { 'title': '房间选择' },
