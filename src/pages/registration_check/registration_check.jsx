@@ -41,6 +41,95 @@ export default class Index extends Component {
   onChange = (value) => {
     this.setState({ current: value })
   }
+  list = () => {
+    //查询可用房间
+    Taro.request({
+      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/avail/rmno/list',
+      header: {
+        'Content-Type': 'application/json',
+        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+      },
+      method: 'POST',
+      data: {
+        "hotelGroupCode": "EDBG",
+        "hotelCode": "EDB1",
+        rmtype: this.state.getinfo.rmtype,
+        arr: this.state.getinfo.arr,
+        dep: this.state.getinfo.dep
+      },
+      dataType: 'json',
+      success: (res) => {
+        console.log(res, '查询可用房')
+        if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
+          // this.check(res.data.resultInfo[0].rmno)
+          this.setState({ room: res.data.resultInfo[0].rmno })
+          this.pay()
+        } else {
+          Taro.showToast({
+            title: '无可用房间，请联系酒店前台',
+            icon: 'none'
+          })
+        }
+      }
+    })
+  }
+  check = (room) => {
+    Taro.request({
+      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmno/assign',
+      header: {
+        'Content-Type': 'application/json',
+        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+      },
+      method: 'POST',
+      data: {
+        "hotelGroupCode": "EDBG",
+        "hotelCode": "EDB1",
+        masterId: this.state.getinfo.id,
+        rmno: this.state.room
+      },
+      dataType: 'json',
+      success: (res) => {
+        console.log(res, '成员单排房')
+        if (res.data && res.data.resultCode === 0) {
+          this.checkin()
+        } else {
+          Taro.showToast({
+            title: '已入住状态',
+            icon: 'none'
+          })
+        }
+      }
+    })
+  }
+  checkin = () => {
+    Taro.request({
+      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/checkin',
+      header: {
+        'Content-Type': 'application/json',
+        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+      },
+      method: 'POST',
+      data: {
+        "hotelGroupCode": "EDBG",
+        "hotelCode": "EDB1",
+        masterId: this.state.getinfo.id,
+      },
+      dataType: 'json',
+      success: (res) => {
+        console.log(res, '成员单登记入住')
+        if (res.data && res.data.resultCode === 0) {
+          Taro.navigateTo({ url: `/pages/success_check/success_check?info=${JSON.stringify(this.state.getinfo)}&name=${this.state.name}&idcard=${this.state.idcard}&mobile=${this.state.mobile}` })
+          // this.pay()
+          // Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.getinfo)}&appid=${this.state.appid}&mobile=${this.state.mobile}` })
+        } else {
+          Taro.showToast({
+            title: '入住失败 请联系酒店前台',
+            icon: 'none'
+          })
+        }
+      }
+    })
+  }
   pay = () => {
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
@@ -52,9 +141,9 @@ export default class Index extends Component {
       data: {
         "hotelGroupCode": "EDBG",
         "hotelCode": "EDB1",
-        subject: "豪华大床房",
+        subject: this.state.getinfo.rmtype,
         masterId: this.state.getinfo.id,
-        totalFee: 0.01,
+        totalFee:this.state.money.nonPay,
         buyerId: this.state.appid
       },
       dataType: 'json',
@@ -67,7 +156,8 @@ export default class Index extends Component {
               if (res.result === "" && res.resultCode === '6001') {
                 return
               } else {
-                Taro.navigateTo({ url: `/pages/success_check/success_check?info=${JSON.stringify(this.state.getinfo)}&name=${this.state.name}&idcard=${this.state.idcard}&mobile=${this.state.mobile}` })
+                this.check()
+                // Taro.navigateTo({ url: `/pages/success_check/success_check?info=${JSON.stringify(this.state.getinfo)}&name=${this.state.name}&idcard=${this.state.idcard}&mobile=${this.state.mobile}` })
               }
             },
             fail: (res) => {
@@ -109,7 +199,6 @@ export default class Index extends Component {
               <View className='check'>离店：{this.state.getinfo.dep}</View>
               <Text className='check'>共{this.state.getinfo.rmnum} 1晚</Text>
             </View>
-            <View className='room'>地址：西湖区文三路</View>
           </AtCard>
           <View className='at-article'>
             <Text className='person_check'>入住人</Text>

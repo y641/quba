@@ -18,6 +18,7 @@ export default class Index extends Component {
     appid: ''
   }
   componentWillMount() {
+    console.log(this.$router.params)
     let info = JSON.parse(this.$router.params.info)
     let money = JSON.parse(this.$router.params.money)
     this.setState({ getinfo: info, money, appid: this.$router.params.appid })
@@ -133,9 +134,6 @@ export default class Index extends Component {
               }
             })
           }
-
-
-
         }}>确定</AtButton>
       </View>
     )

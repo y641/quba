@@ -12,7 +12,7 @@ export default class Index extends Component {
     appid: null,
     getinfo:null  //用户信息
   }
-  componentDidMount() {
+  componentWillMount() {
     my.getAuthCode({
       scopes: 'auth_user',
       success: (res) => {
