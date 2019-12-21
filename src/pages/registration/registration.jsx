@@ -80,7 +80,6 @@ export default class Index extends Component {
         console.log(res, '查询可用房')
         if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
           this.pay()
-          // this.check(res.data.resultInfo[0].rmno)
           this.setState({ room: res.data.resultInfo[0].rmno})
         } else {
           Taro.showToast({
@@ -151,8 +150,6 @@ export default class Index extends Component {
         console.log(res, '成员单登记入住')
         if (res.data && res.data.resultCode === 0) {
           Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
-          // this.pay()
-          // Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.getinfo)}&appid=${this.state.appid}&mobile=${this.state.mobile}` })
         } else {
           Taro.showToast({
             title: '入住失败 请联系酒店前台',
@@ -183,7 +180,6 @@ export default class Index extends Component {
         subject: this.state.getinfo[0].rmtype,
         masterId: this.state.getinfo[0].id,
         totalFee: this.state.money.nonPay,
-        // totalFee:0.01,
         buyerId: this.state.appid
       },
       dataType: 'json',
@@ -195,6 +191,7 @@ export default class Index extends Component {
             success: (res) => {
               console.log(res, '唤起收银台')
               if (res.result && res.memo === "") {
+                //付款成功 排房
                 this.check()
               }
             },
@@ -257,10 +254,6 @@ export default class Index extends Component {
             <Text className='person at-article ' onClick={this.test}>添加同住人</Text>
           </View>
           <View className='line'></View>
-          {/* 入住人信息 */}
-          {/* <View className='at-article__p'>入住人:{this.state.getinfo.name || this.state.getinfo.rsvMan}</View>
-          <View className='at-article__p'>{`手机号：${this.state.getinfo.mobile || this.state.mobile}`}</View>
-          <View className='at-article__p'>{`身份证：${this.state.getinfo.idNo}`}</View> */}
           {/* 同住人信息 */}
           {this.state.getinfo && this.state.getinfo.map((item, index) => {
             return <View>
@@ -291,10 +284,7 @@ export default class Index extends Component {
               </AtFloatLayout> : null}
             </Text>
             <AtIcon value='chevron-up' size='20' color='#666' className='icon'></AtIcon>
-            {/* <Text className='money_p' onClick={this.list}>确认登记并支付押金</Text> */}
-            <Text className='money_p' onClick={() => {
-              Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
-            }}>确认登记并支付押金</Text>
+            <Text className='money_p' onClick={this.list}>确认登记并支付押金</Text>
           </View>
         </View>
       </View>
