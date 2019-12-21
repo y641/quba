@@ -10,11 +10,12 @@ export default class Index extends Component {
   }
   state = {
    current: 3,
-   getinfo:null
+    getinfo: null,
+   money:null
   }
   componentWillMount() {
    let info = JSON.parse(this.$router.params.info)
-   console.log(info)
+   console.log(info,'你好好好')
    this.setState({getinfo:info})
   }
   onChange = (value) => {
@@ -42,10 +43,19 @@ export default class Index extends Component {
         </View>
         <View className='line'></View>
         {/* 入住人信息 */}
-        <View className='at-article__p'>{this.state.getinfo.name || this.state.getinfo.rsvMan}</View>
+        {/* <View className='at-article__p'>{this.state.getinfo.name || this.state.getinfo.rsvMan}</View>
         <View className='at-article__p'>{`手机号：${this.state.getinfo.mobile}`}</View>
-        <View className='at-article__p'>{`身份证：${this.state.getinfo.idNo}`}</View>
+        <View className='at-article__p'>{`身份证：${this.state.getinfo.idNo}`}</View> */}
+        {this.state.getinfo && this.state.getinfo.map((item) => {
+          return <View className='at-article__h1'>
+            <View className='at-article__p'>{item.name}</View>
+            <View className='at-article__p'>手机号：{item.mobile}</View>
+            <View className='at-article__p'>身份证{item.idcard}</View>
+            <View className='line'></View>
+          </View>
+        })}
         <AtButton type='primary' onClick={() => {
+          Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}`})
         }}>添加同住人</AtButton>
       </View>
     )

@@ -13,6 +13,9 @@ export default class Index extends Component {
     getinfo:null  //用户信息
   }
   componentWillMount() {
+    
+  }
+  getCode = () => {
     my.getAuthCode({
       scopes: 'auth_user',
       success: (res) => {
@@ -64,6 +67,7 @@ export default class Index extends Component {
         console.log(res, '获取用户信息')
         if (res.data && res.data.resultCode === 0) {
           this.setState({ getinfo: res.data.resultInfo })
+          this.inquiryMembe(res.data.resultInfo.certNo)
         } else {
           Taro.showToast({
             title: '获取信息失败',
@@ -74,8 +78,8 @@ export default class Index extends Component {
   })
 }
   //按照身份证号查询成员单
-  inquiryMembe = () => {
-    console.log(this.state.getinfo.certNo)
+  inquiryMembe = (certNo) => {
+    // console.log(this.state.getinfo.certNo)
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/list',
       header: {
@@ -87,7 +91,7 @@ export default class Index extends Component {
         "hotelGroupCode": "EDBG",
         "hotelCode": "EDB1",
         idCode: '01',
-        idNo: this.state.getinfo.certNo
+        idNo: certNo
       },
       dataType: 'json',
       success: (res) => {
@@ -98,11 +102,16 @@ export default class Index extends Component {
           this.inquiryName()
         } else {
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}` })
+          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}` })
         }
       },
       fail: (res) => {
-        console.log(res, '失败')
+        Taro.hideLoading()
+        Taro.showToast({
+          title: '请求失败',
+          icon:'none'
+        })
+        return 
       }
     })
   }
@@ -128,11 +137,16 @@ export default class Index extends Component {
           this.phone() 
         } else {
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}` })
+          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}`})
         }
       },
       fail: (res) => {
-        console.log(res, '失败')
+        Taro.hideLoading()
+        Taro.showToast({
+          title: '请求失败',
+          icon:'none'
+        })
+        return
       }
     })
   }
@@ -157,8 +171,16 @@ export default class Index extends Component {
           this.inquiryPredetermined()
         } else {
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}` })
+          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}` })
         }
+      },
+      fail: () => {
+        Taro.hideLoading()
+        Taro.showToast({
+          title: '请求失败',
+          icon:'none'
+        })
+        return
       }
     })
   }
@@ -189,7 +211,12 @@ export default class Index extends Component {
         }
       },
       fail: (res) => {
-        console.log(res, '失败')
+        Taro.hideLoading()
+        Taro.showToast({
+          title: '请求失败',
+          icon:'none'
+        })
+        return
       }
     })
   }
@@ -216,6 +243,13 @@ export default class Index extends Component {
           //按照手机号查询预订单
           this.mobile()
         }
+      },
+      fail: () => {
+        Taro.hideLoading()
+        Taro.showToast({
+          title: '请求失败',
+          icon:'none'
+        })
       }
     })
   }
@@ -238,11 +272,21 @@ export default class Index extends Component {
         if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
           this.getContnet(res.data.resultInfo[0])
         } else {
+          Taro.hideLoading()
           Taro.showToast({
             title: '没有查询到订单',
             icon:'none'
           })
+          return
         }
+      },
+      fail: () => {
+        Taro.hideLoading()
+        Taro.showToast({
+          title: '请求失败',
+          icon:'none'
+        })
+        return 
       }
     })
   }
@@ -278,11 +322,16 @@ export default class Index extends Component {
         console.log(res, '拆分成员单')
         if (res.data && res.data.resultCode === 0) {
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}` })
+          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}` })
         }
       },
       fail: (res) => {
-        console.log(res, '失败')
+        Taro.hideLoading()
+        Taro.showToast({
+          title: '请求失败',
+          icon:'none'
+        })
+        return
       }
     })
   }
@@ -314,7 +363,7 @@ export default class Index extends Component {
               Taro.showLoading({
                 title: '匹配中'
               })
-              this.inquiryMembe()
+              this.getCode()
             }} />
             <AtListItem
               note='GROUP'

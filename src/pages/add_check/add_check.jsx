@@ -3,6 +3,8 @@ import { View, Text, Picker } from '@tarojs/components'
 import { AtInput, AtForm, AtIcon, AtButton } from 'taro-ui'
 import './add_check.scss'
 
+var info = []
+var haha=[]
 export default class Index extends Component {
   config = {
     navigationBarTitleText: '添加同住',
@@ -14,14 +16,17 @@ export default class Index extends Component {
     mobile: '',
     idCard: '',
     getinfo: null,
-    money: null,
+    // money: null,
     appid: ''
   }
   componentWillMount() {
-    console.log(this.$router.params)
-    let info = JSON.parse(this.$router.params.info)
-    let money = JSON.parse(this.$router.params.money)
-    this.setState({ getinfo: info, money, appid: this.$router.params.appid })
+    info = [...info,this.$router.params.info]
+    console.log(info, 'info')
+    // let getinfo = JSON.parse(info[0].info)
+    let getinfo = JSON.parse(info[0])
+    console.log(getinfo,'getinfo')
+    // let money = JSON.parse(info[0].money)
+    this.setState({ getinfo, appid: info[0].appid })
   }
   onChange = e => {
     this.setState({
@@ -130,7 +135,12 @@ export default class Index extends Component {
               dataType: 'json',
               success: (res) => {
                 console.log(res, '添加同住人')
-                Taro.navigateTo({ url: `/pages/registration_check/registration_check?name=${this.state.name}&mobile=${this.state.mobile}&selector=${this.state.selectorChecked}&idcard=${this.state.idCard}&info=${JSON.stringify(this.state.getinfo)}&money=${JSON.stringify(this.state.money)}&appid=${this.state.appid}` })
+                // Taro.navigateTo({ url: `/pages/registration_check/registration_check?name=${this.state.name}&mobile=${this.state.mobile}&selector=${this.state.selectorChecked}&idcard=${this.state.idCard}&info=${JSON.stringify(this.state.getinfo)}&money=${JSON.stringify(this.state.money)}&appid=${this.state.appid}` })
+                Taro.navigateTo({
+                  url: `/pages/registration/registration?info=${JSON.stringify({
+                    name: this.state.name, mobile: this.state.mobile,selector:this.state.selectorChecked,idcard:this.state.idCard
+                  })}`
+                })
               }
             })
           }

@@ -11,14 +11,16 @@ export default class Index extends Component {
     current: 0,
     icon: 'check',
     iconcheck: false,
-    getinfo: null,
-    appid: null,
-     mobile:''
+    getinfo: null, //订单信息
+    appid: null,  //userid
+    mobile: '', //手机号
+    username: '', //真实姓名
+    idcard:'' //身份证号码
   }
   componentWillMount() {
     console.log(this.$router.params)
     let info = JSON.parse(this.$router.params.info)
-    this.setState({ getinfo: info, appid: this.$router.params.appid, mobile:this.$router.params.mobile })
+    this.setState({ getinfo: info, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, idcard: this.$router.params.idcard })
   }
   onChange = (value) => {
     this.setState({ current: value })
@@ -60,9 +62,9 @@ export default class Index extends Component {
           title='请选择入住信息'
           onClick={() => { console.log('111') }}
         >
-          <View className='at-article'>入住人：{this.state.getinfo.name}（本人）</View>
+          <View className='at-article'>入住人：{this.state.username}（本人）</View>
           <View className='at-article'>联系电话：{this.state.getinfo.mobile || this.state.mobile}</View>
-          <View className='at-article'>证件：{this.state.getinfo.idNo}</View>
+          <View className='at-article'>证件：{this.state.idcard}</View>
           <View className='at-article'>入住房型：{this.state.getinfo.rmtype}</View>
           <View className='at-article'>房间数量：共1间</View>
         </AtCard>
@@ -70,7 +72,7 @@ export default class Index extends Component {
           {/* <AtButton type='primary' onClick={this.list}>确认选择</AtButton> */}
         </View>
         <AtButton type='primary' onClick={() => {
-          Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.getinfo)}&appid=${this.state.appid}&&mobile=${this.state.mobile}` })
+          Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.getinfo)}&appid=${this.state.appid}&mobile=${this.state.mobile}&username=${this.state.username}` })
         }}>确认选择</AtButton>
       </View>
     )
