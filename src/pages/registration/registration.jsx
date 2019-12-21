@@ -22,7 +22,7 @@ export default class Index extends Component {
     username:''  //真实姓名
   }
   componentWillMount() {
-    console.log(this.$router.params)
+    console.log(this.$router.params,'sjknjkdjndkjnjk')
     list = [...list, JSON.parse(this.$router.params.info)];
     console.log("list:",list)
     this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username })

@@ -43,9 +43,6 @@ export default class Index extends Component {
         </View>
         <View className='line'></View>
         {/* 入住人信息 */}
-        {/* <View className='at-article__p'>{this.state.getinfo.name || this.state.getinfo.rsvMan}</View>
-        <View className='at-article__p'>{`手机号：${this.state.getinfo.mobile}`}</View>
-        <View className='at-article__p'>{`身份证：${this.state.getinfo.idNo}`}</View> */}
         {this.state.getinfo && this.state.getinfo.map((item) => {
           return <View className='at-article__h1'>
             <View className='at-article__p'>{item.name}</View>

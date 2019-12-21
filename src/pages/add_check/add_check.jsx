@@ -18,10 +18,11 @@ export default class Index extends Component {
     appid: ''
   }
   componentWillMount() {
+    console.log(this.$router.params)
     info = [...info,this.$router.params.info]
     let getinfo = JSON.parse(info[0])
     console.log(getinfo,'getinfo')
-    this.setState({ getinfo, appid: info[0].appid })
+    this.setState({ getinfo, appid:this.$router.params.appid })
   }
   onChange = e => {
     this.setState({
@@ -133,7 +134,7 @@ export default class Index extends Component {
                 Taro.navigateTo({
                   url: `/pages/registration/registration?info=${JSON.stringify({
                     name: this.state.name, mobile: this.state.mobile,selector:this.state.selectorChecked,idcard:this.state.idCard
-                  })}`
+                  })}&,appid=${this.state.appid}`
                 })
               }
             })
