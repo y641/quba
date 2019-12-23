@@ -9,21 +9,29 @@ export default class Index extends Component {
   }
   state = {
     current: 0,
-    icon: 'check',
-    iconcheck: false,
+    icon: '#ddd',
+    checkcircle: '#6190E8',
+    iconcheck: true,
     getinfo: null, //订单信息
     appid: null,  //userid
     mobile: '', //手机号
     username: '', //真实姓名
-    idcard:'' //身份证号码
+    idcard: '', //身份证号码
+    rmnum: ''
   }
   componentWillMount() {
-    console.log(this.$router.params)
     let info = JSON.parse(this.$router.params.info)
-    this.setState({ getinfo: info, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, idcard: this.$router.params.idcard })
+    this.setState({ getinfo: info, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, idcard: this.$router.params.idcard, rmnum: this.$router.params.rmnum })
   }
-  onChange = (value) => {
-    this.setState({ current: value })
+  choose = () => {
+    if (this.state.iconcheck === false) {
+      Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.getinfo)}&appid=${this.state.appid}&mobile=${this.state.mobile}&username=${this.state.username}` })
+    } else {
+      Taro.showToast({
+        title: '请选择',
+        icon: 'none'
+      })
+    }
   }
   render() {
     const items = [
@@ -46,6 +54,7 @@ export default class Index extends Component {
             this.setState({ iconcheck: !this.state.iconcheck })
           }}
         >
+          <AtIcon value='check-circle' size='30' color={this.state.iconcheck ? this.state.icon : this.state.checkcircle}></AtIcon>
           <View>
             <Text className='at-article'>预定人：{this.state.getinfo.name}</Text>
             <Text className='at-article ditch'>预定渠道：飞猪</Text>
@@ -54,26 +63,20 @@ export default class Index extends Component {
           <View className='at-article'>入住日期：{this.state.getinfo.arr}</View>
           <View className='at-article'>离店日期：{this.state.getinfo.dep}</View>
           <View className='at-article'>入住房型：{this.state.getinfo.rmtype}</View>
-          <View className='at-article'>房间数量：共1间</View>
+          <View className='at-article'>房间数量：共{this.state.rmnum}间</View>
         </AtCard>
-        <AtIcon value={this.state.iconcheck ? this.state.icon : ""} size='30' color='#6190E8'></AtIcon>
+
         {/* 入住信息 */}
-        <AtCard
-          title='请选择入住信息'
-          onClick={() => { console.log('111') }}
-        >
+        <AtCard title='请选择入住信息'>
           <View className='at-article'>入住人：{this.state.username}（本人）</View>
           <View className='at-article'>联系电话：{this.state.getinfo.mobile || this.state.mobile}</View>
           <View className='at-article'>证件：{this.state.idcard}</View>
           <View className='at-article'>入住房型：{this.state.getinfo.rmtype}</View>
-          <View className='at-article'>房间数量：共1间</View>
+          <View className='at-article'>房间数量：共{this.state.rmnum}间</View>
         </AtCard>
         <View className='at-article'>
-          {/* <AtButton type='primary' onClick={this.list}>确认选择</AtButton> */}
         </View>
-        <AtButton type='primary' onClick={() => {
-          Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.getinfo)}&appid=${this.state.appid}&mobile=${this.state.mobile}&username=${this.state.username}` })
-        }}>确认选择</AtButton>
+        <AtButton type='primary' onClick={this.choose}>确认选择</AtButton>
       </View>
     )
   }

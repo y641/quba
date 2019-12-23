@@ -10,7 +10,7 @@ export default class Index extends Component {
   state = {
     hasBorder: false,
     appid: null,
-    getinfo:null  //用户信息
+    getinfo: null,  //用户信息
   }
   componentWillMount() {
     
@@ -238,6 +238,7 @@ export default class Index extends Component {
       success: (res) => {
         console.log(res, '姓名查询预定单')
         if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
+          this.setState({ rmnum: res.data.resultInfo[0].rmnum})
           this.getContnet(res.data.resultInfo[0])
         } else {
           //按照手机号查询预订单
@@ -322,7 +323,7 @@ export default class Index extends Component {
         console.log(res, '拆分成员单')
         if (res.data && res.data.resultCode === 0) {
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}` })
+          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&rmnum=${info.rmnum}` })
         }
       },
       fail: (res) => {
@@ -334,6 +335,12 @@ export default class Index extends Component {
         return
       }
     })
+  }
+  doClick = () => {
+    Taro.showLoading({
+      title: '匹配中'
+    })
+    this.getCode()
   }
   render() {
     return (
@@ -359,12 +366,7 @@ export default class Index extends Component {
         {/* 卡片 */}
         <AtCard>
           <AtList hasBorder={this.state.hasBorder}>
-            <AtListItem title='散客入住' note='FIT' loading onClick={() => {
-              Taro.showLoading({
-                title: '匹配中'
-              })
-              this.getCode()
-            }} />
+            <AtListItem title='散客入住' note='FIT' loading onClick={this.doClick} />
             <AtListItem
               note='GROUP'
               title='团队入住'

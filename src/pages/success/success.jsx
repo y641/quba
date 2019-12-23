@@ -18,9 +18,6 @@ export default class Index extends Component {
    console.log(info,'你好好好')
    this.setState({getinfo:info})
   }
-  onChange = (value) => {
-    this.setState({ current: value })
-  }
   render() {
     const items = [
       { 'title': '房间选择' },
@@ -52,8 +49,9 @@ export default class Index extends Component {
           </View>
         })}
         <AtButton type='primary' onClick={() => {
-          Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}`})
-        }}>添加同住人</AtButton>
+          // Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}`})
+          Taro.redirectTo({url:'/pages/index/index'})
+        }}>返回首页</AtButton>
       </View>
     )
   }

@@ -9,12 +9,10 @@ class App extends Component {
   config = {
     pages: [
       'pages/index/index',
+      'pages/order_check/order_check',
       'pages/registration/registration',
-      'pages/registration_check/registration_check',
       'pages/add_check/add_check',
       'pages/success/success',
-      'pages/order_check/order_check',
-      'pages/success_check/success_check'
     ],
     window: {
       backgroundTextStyle: 'light',

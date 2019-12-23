@@ -56,9 +56,6 @@ export default class Index extends Component {
       }
     })
   }
-  onChange = (value) => {
-    this.setState({ current: value })
-  }
   list = () => {
     //查询可用房间
     Taro.request({
@@ -167,6 +164,7 @@ export default class Index extends Component {
     })
   }
   pay = () => {
+    console.log(this.state.getinfo[0].id, this.state.getinfo[0].rmtype, this.state.money.nonPay, this.state.appid,'收钱')
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
       header: {
@@ -186,26 +184,13 @@ export default class Index extends Component {
       success: (res) => {
         console.log(res, '支付接口')
         if (res.data && res.data.resultCode === 0) {
-          my.tradePay({
-            tradeNO: res.data.resultInfo,
-            success: (res) => {
-              console.log(res, '唤起收银台')
-              if (res.result && res.memo === "") {
-                //付款成功 排房
-                this.check()
-              }
-            },
-            fail: (res) => {
-              Taro.showToast({
-                title: '请求失败',
-                icon:'none'
-              })
-            }
-          });
+          //唤起收银台
+         this.success(res.data.resultInfo)
         } else {
           Taro.showToast({
             title: '付款失败'
           })
+          return
         }
       },
       fail: () => {
@@ -215,6 +200,25 @@ export default class Index extends Component {
         })
       }
     })
+  }
+  success = (trade) => {
+    my.tradePay({
+      tradeNO: trade,
+      success: (res) => {
+        console.log(res, '唤起收银台')
+        if (res.result && res.memo === "") {
+          //付款成功 排房
+          this.check()
+        }
+      },
+      fail: (res) => {
+        Taro.showToast({
+          title: '请求失败',
+          icon: 'none'
+        })
+        return
+      }
+    });
   }
   test = () => {
     Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}&money=${JSON.stringify(this.state.money)}&appid=${this.state.appid}` })

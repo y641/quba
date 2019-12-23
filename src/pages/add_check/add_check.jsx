@@ -46,7 +46,48 @@ export default class Index extends Component {
       },
     });
   }
-
+  choose = () => {
+    if (this.state.name === '') {
+      Taro.showToast({ title: '姓名不能为空', icon: 'none' }
+      )
+      return
+    } else if (this.state.mobile === "") {
+      Taro.showToast({ title: '手机号不能为空', icon: 'none' }
+      )
+      return
+    } else if (this.state.idCard === "") {
+      Taro.showToast({ title: '身份证号不能为空', icon: 'none' }
+      )
+      return
+    } else {
+      Taro.request({
+        url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/src/masteradd',
+        header: {
+          'Content-Type': 'application/json',
+          'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+        },
+        method: 'POST',
+        data: {
+          "hotelGroupCode": "EDBG",
+          "hotelCode": "EDB1",
+          name: this.state.name,
+          sex: '女',
+          idCode: '01',
+          idNo: this.state.idCard,
+          masterId: this.state.getinfo.id
+        },
+        dataType: 'json',
+        success: (res) => {
+          console.log(res, '添加同住人')
+          Taro.navigateTo({
+            url: `/pages/registration/registration?info=${JSON.stringify({
+              name: this.state.name, mobile: this.state.mobile, selector: this.state.selectorChecked, idcard: this.state.idCard
+            })}&,appid=${this.state.appid}`
+          })
+        }
+      })
+    }
+}
   render() {
     return (
       <View className='add_check'>
@@ -98,48 +139,7 @@ export default class Index extends Component {
         <View onClick={this.choosePhoneContact} style={{ width: '5rem' }}>
           <AtIcon value='user' size='25' color='#1F90E6'></AtIcon>
         </View>
-        <AtButton type='primary' onClick={() => {
-          if (this.state.name === '') {
-            Taro.showToast({ title: '姓名不能为空', icon: 'none' }
-            )
-            return
-          } else if (this.state.mobile === "") {
-            Taro.showToast({ title: '手机号不能为空', icon: 'none' }
-            )
-            return
-          } else if (this.state.idCard === "") {
-            Taro.showToast({ title: '身份证号不能为空', icon: 'none' }
-            )
-            return
-          } else {
-            Taro.request({
-              url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/src/masteradd',
-              header: {
-                'Content-Type': 'application/json',
-                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-              },
-              method: 'POST',
-              data: {
-                "hotelGroupCode": "EDBG",
-                "hotelCode": "EDB1",
-                name: this.state.name,
-                sex: '女',
-                idCode: '01',
-                idNo: this.state.idCard,
-                masterId: this.state.getinfo.id
-              },
-              dataType: 'json',
-              success: (res) => {
-                console.log(res, '添加同住人')
-                Taro.navigateTo({
-                  url: `/pages/registration/registration?info=${JSON.stringify({
-                    name: this.state.name, mobile: this.state.mobile,selector:this.state.selectorChecked,idcard:this.state.idCard
-                  })}&,appid=${this.state.appid}`
-                })
-              }
-            })
-          }
-        }}>确定</AtButton>
+        <AtButton type='primary' onClick={this.choose}>确定</AtButton>
       </View>
     )
   }
