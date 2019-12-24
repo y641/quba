@@ -82,7 +82,7 @@ export default class Index extends Component {
           Taro.navigateTo({
             url: `/pages/registration/registration?info=${JSON.stringify({
               name: this.state.name, mobile: this.state.mobile, selector: this.state.selectorChecked, idcard: this.state.idCard
-            })}&,appid=${this.state.appid}`
+            })}&appid=${this.state.appid}`
           })
         }
       })

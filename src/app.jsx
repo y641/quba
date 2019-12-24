@@ -37,6 +37,12 @@ class App extends Component {
         "selectedIconPath": "./img/me_active.png"
       }]
     },
+    "plugins": {
+      "myPlugin": {
+        "version": "*",
+        "provider": "2019112669415926"
+      },
+    }
   }
 
   // 在 App 类中的 render() 函数没有实际作用

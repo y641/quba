@@ -5,7 +5,7 @@ import './index.scss'
 
 export default class Index extends Component {
   config = {
-    navigationBarTitleText: '绿云大酒店'
+    navigationBarTitleText: '绿云大酒店',
   }
   state = {
     hasBorder: false,
@@ -270,10 +270,10 @@ export default class Index extends Component {
       dataType: 'json',
       success: (res) => {
         console.log(res,'手机号查询预订单')
-        if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
+        if (res.data && res.data.resultInfo.length > 0) {
+          console.log('hahahhab')
           this.getContnet(res.data.resultInfo[0])
         } else {
-          Taro.hideLoading()
           Taro.showToast({
             title: '没有查询到订单',
             icon:'none'

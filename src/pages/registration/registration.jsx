@@ -3,12 +3,14 @@ import { View, Text } from '@tarojs/components'
 import { AtSteps, AtCard, AtList, AtListItem, AtIcon, AtFloatLayout } from 'taro-ui'
 import "taro-ui/dist/style/components/float-layout.scss";
 import './registration.scss'
-import { buildURL, decodeQuery } from '../util/AppUtil'
 
 var list = [];
 export default class Index extends Component {
   config = {
     navigationBarTitleText: '登记确认',
+    'usingComponents': {
+      'unify-pay':'plugin://myPlugin/UnifyPay'
+    }
   }
   state = {
     current: 1,
@@ -19,17 +21,17 @@ export default class Index extends Component {
     appid: '', //用户id
     mobile: '',  //手机号
     room: '',  //房间码
-    username:''  //真实姓名
+    username: '',  //真实姓名
+    rmnum:'haha'
   }
   componentWillMount() {
-    console.log(this.$router.params,'sjknjkdjndkjnjk')
+    console.log(this.$router.params)
     list = [...list, JSON.parse(this.$router.params.info)];
-    console.log("list:",list)
-    this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username })
+    console.log(list,'list')
+    this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, rmnum: this.$router.params.rmnum})
     this.getMoney(list[0].id)
   }
   getMoney = (id) => {
-    console.log(id,'传过来的id')
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmfee/nonpay',
       header: {
@@ -43,7 +45,6 @@ export default class Index extends Component {
         masterId: id
       },
       success: (res) => {
-        console.log(res, '押金')
         if (res.data && res.data.resultCode === 0) {
           this.setState({ isLoading: false, money: res.data.resultInfo })
         }
@@ -74,7 +75,6 @@ export default class Index extends Component {
       },
       dataType: 'json',
       success: (res) => {
-        console.log(res, '查询可用房')
         if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
           this.pay()
           this.setState({ room: res.data.resultInfo[0].rmno})
@@ -94,6 +94,7 @@ export default class Index extends Component {
       }
     })
   }
+  //成元单排房
   check = () => {
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmno/assign',
@@ -110,7 +111,6 @@ export default class Index extends Component {
       },
       dataType: 'json',
       success: (res) => {
-        console.log(res, '成员单排房')
         if (res.data && res.data.resultCode === 0) {
           this.checkin()
         } else {
@@ -129,6 +129,7 @@ export default class Index extends Component {
       }
     })
   }
+  //成员单登记入住
   checkin = () => {
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/checkin',
@@ -144,7 +145,6 @@ export default class Index extends Component {
       },
       dataType: 'json',
       success: (res) => {
-        console.log(res, '成员单登记入住')
         if (res.data && res.data.resultCode === 0) {
           Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
         } else {
@@ -163,8 +163,8 @@ export default class Index extends Component {
       }
     })
   }
+  //获取tardeNo
   pay = () => {
-    console.log(this.state.getinfo[0].id, this.state.getinfo[0].rmtype, this.state.money.nonPay, this.state.appid,'收钱')
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
       header: {
@@ -182,7 +182,6 @@ export default class Index extends Component {
       },
       dataType: 'json',
       success: (res) => {
-        console.log(res, '支付接口')
         if (res.data && res.data.resultCode === 0) {
           //唤起收银台
          this.success(res.data.resultInfo)
@@ -201,11 +200,11 @@ export default class Index extends Component {
       }
     })
   }
+  //唤起收银台
   success = (trade) => {
     my.tradePay({
       tradeNO: trade,
       success: (res) => {
-        console.log(res, '唤起收银台')
         if (res.result && res.memo === "") {
           //付款成功 排房
           this.check()
@@ -249,7 +248,7 @@ export default class Index extends Component {
             <View className='at-article '>
               <View className='at-article '>入住：{this.state.getinfo[0].arr}</View>
               <View className='at-article '>离店：{this.state.getinfo[0].dep}
-                <Text className='at-article disth'>共{this.state.getinfo[0].rmnum} 1晚</Text>
+                <Text className='at-article disth'>共{this.stata.rmnum}晚</Text>
               </View>
             </View>
           </AtCard>
@@ -268,7 +267,39 @@ export default class Index extends Component {
             </View>
           })}
           {/* 费用明细 */}
-          <View className='momey'>
+          <View style="margin:30px 10px 0 10px;">
+            <unify-pay
+              userId={this.state.appid}
+              serviceId='2019122400000000000003655000'
+              onClick={(e) => {
+                if (e.preFreeze) {
+                  
+                } else {
+                  Taro.request({
+                    url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
+                    header: {
+                      'Content-Type': 'application/json',
+                      'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+                    },
+                    method: 'POST',
+                    data: {
+                      "hotelGroupCode": "EDBG",
+                      "hotelCode": "EDB1",
+                      subject: this.state.getinfo[0].rmtype,
+                      masterId: this.state.getinfo[0].id,
+                      totalFee: this.state.money.nonPay,
+                      buyerId: this.state.appid
+                    },
+                    dataType: 'json',
+                    success: res => {
+                      console.log(res,'tardeNo')
+                    }
+                  })
+                }
+              }}
+            />
+          </View>
+          {/* <View className='momey'>
             <Text onClick={() => { this.setState({ status: !this.state.status }) }}>
               <Text className='money_r'>{`￥${this.state.money && this.state.money.nonPay}`}</Text>
               <Text className='money_t'>明细</Text>
@@ -289,7 +320,7 @@ export default class Index extends Component {
             </Text>
             <AtIcon value='chevron-up' size='20' color='#666' className='icon'></AtIcon>
             <Text className='money_p' onClick={this.list}>确认登记并支付押金</Text>
-          </View>
+          </View> */}
         </View>
       </View>
     )

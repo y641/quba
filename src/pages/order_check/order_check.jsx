@@ -25,7 +25,7 @@ export default class Index extends Component {
   }
   choose = () => {
     if (this.state.iconcheck === false) {
-      Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.getinfo)}&appid=${this.state.appid}&mobile=${this.state.mobile}&username=${this.state.username}` })
+      Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.getinfo)}&appid=${this.state.appid}&mobile=${this.state.mobile}&username=${this.state.username}&rmnum=${this.state.rmnum}` })
     } else {
       Taro.showToast({
         title: '请选择',
