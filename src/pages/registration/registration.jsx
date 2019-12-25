@@ -22,12 +22,10 @@ export default class Index extends Component {
     mobile: '',  //手机号
     room: '',  //房间码
     username: '',  //真实姓名
-    rmnum:'haha'
+    rmnum:''
   }
   componentWillMount() {
-    console.log(this.$router.params)
     list = [...list, JSON.parse(this.$router.params.info)];
-    console.log(list,'list')
     this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, rmnum: this.$router.params.rmnum})
     this.getMoney(list[0].id)
   }
@@ -220,7 +218,7 @@ export default class Index extends Component {
     });
   }
   test = () => {
-    Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}&money=${JSON.stringify(this.state.money)}&appid=${this.state.appid}` })
+    Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}&appid=${this.state.appid}` })
   }
   render() {
     const items = [
@@ -235,12 +233,9 @@ export default class Index extends Component {
           <AtSteps
             items={items}
             current={this.state.current}
-            onChange={this.onChange}
           />
           {/* 登记确认 */}
-          <AtCard
-            onClick={() => { console.log('111') }}
-          >
+          <AtCard>
             <View className='at-article '>
               <Text >绿云大酒店</Text>
               <Text className='at-article disthapp '>1003</Text>
@@ -248,7 +243,7 @@ export default class Index extends Component {
             <View className='at-article '>
               <View className='at-article '>入住：{this.state.getinfo[0].arr}</View>
               <View className='at-article '>离店：{this.state.getinfo[0].dep}
-                <Text className='at-article disth'>共{this.stata.rmnum}晚</Text>
+                {/* <Text className='at-article disth'>共{this.stata.rmnum}晚</Text> */}
               </View>
             </View>
           </AtCard>
