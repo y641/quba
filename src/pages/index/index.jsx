@@ -17,14 +17,16 @@ export default class Index extends Component {
   }
   getCode = () => {
     my.getAuthCode({
-      scopes: 'auth_user',
+        scopes: 'auth_base',
       success: (res) => {
+        console.log(res,'res')
         this.mebme(res.authCode)
       }
     });
   }
   //小程序授权
   mebme = (code) => {
+    console.log(code,'授权码')
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/getauthbuyerid',
       header: {
@@ -49,7 +51,7 @@ export default class Index extends Component {
   }
   //获取用户信息
   getUserInfo = (token) => {
-    console.log(token)
+    console.log(token,'token')
     Taro.request({
       url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/getuserinfobyaccesstoken ',
       header: {
@@ -278,6 +280,7 @@ export default class Index extends Component {
             title: '没有查询到订单',
             icon:'none'
           })
+          Taro.hideLoading()
           return
         }
       },

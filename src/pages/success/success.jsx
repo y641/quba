@@ -40,15 +40,15 @@ export default class Index extends Component {
         </View>
         <View className='line'></View>
         {/* 入住人信息 */}
-        {this.state.getinfo && this.state.getinfo.map((item) => {
+        {this.state.getinfo && this.state.getinfo.map((item,index) => {
           return <View className='at-article__h1'>
             <View className='at-article__p'>{item.name}</View>
             <View className='at-article__p'>手机号：{item.mobile}</View>
-            <View className='at-article__p'>身份证{item.idcard}</View>
+            <View className='at-article__p'>身份证:{index===0 ? item.idNo : item.idcard}</View>
             <View className='line'></View>
           </View>
         })}
-        <AtButton type='primary' onClick={() => {
+        <AtButton type='primary' style='margin:30px 15px 0 15px' onClick={() => {
           // Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}`})
           Taro.redirectTo({url:'/pages/index/index'})
         }}>返回首页</AtButton>

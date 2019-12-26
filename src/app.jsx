@@ -13,6 +13,7 @@ class App extends Component {
       'pages/registration/registration',
       'pages/add_check/add_check',
       'pages/success/success',
+      'pages/me/me'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -31,7 +32,7 @@ class App extends Component {
         "iconPath": "./img/home.png",
         "selectedIconPath": "./img/active.png"
       }, {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/me/me",
         "text": "我的",
         "iconPath": "./img/me.png",
         "selectedIconPath": "./img/me_active.png"

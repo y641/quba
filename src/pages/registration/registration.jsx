@@ -6,295 +6,340 @@ import './registration.scss'
 
 var list = [];
 export default class Index extends Component {
-  config = {
-    navigationBarTitleText: '登记确认',
-    'usingComponents': {
-      'unify-pay':'plugin://myPlugin/UnifyPay'
+    config = {
+        navigationBarTitleText: '登记确认',
+        'usingComponents': {
+            'unify-pay': 'plugin://myPlugin/UnifyPay'
+        }
     }
-  }
-  state = {
-    current: 1,
-    status: false,
-    hasBorder: false,
-    getinfo: null,  //订单信息
-    money: '',  //支付信息
-    appid: '', //用户id
-    mobile: '',  //手机号
-    room: '',  //房间码
-    username: '',  //真实姓名
-    rmnum:''
-  }
-  componentWillMount() {
-    list = [...list, JSON.parse(this.$router.params.info)];
-    this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, rmnum: this.$router.params.rmnum})
-    this.getMoney(list[0].id)
-  }
-  getMoney = (id) => {
-    Taro.request({
-      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmfee/nonpay',
-      header: {
-        'Content-Type': 'application/json',
-        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-      },
-      method: 'POST',
-      data: {
-        "hotelGroupCode": "EDBG",
-        "hotelCode": "EDB1",
-        masterId: id
-      },
-      success: (res) => {
-        if (res.data && res.data.resultCode === 0) {
-          this.setState({ isLoading: false, money: res.data.resultInfo })
-        }
-      },
-      fail: () => {
-        Taro.showToast({
-          title: '请求失败',
-          icon:'none'
-        })
-      }
-    })
-  }
-  list = () => {
-    //查询可用房间
-    Taro.request({
-      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/avail/rmno/list',
-      header: {
-        'Content-Type': 'application/json',
-        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-      },
-      method: 'POST',
-      data: {
-        "hotelGroupCode": "EDBG",
-        "hotelCode": "EDB1",
-        rmtype: this.state.getinfo[0].rmtype,
-        arr: this.state.getinfo[0].arr,
-        dep: this.state.getinfo[0].dep
-      },
-      dataType: 'json',
-      success: (res) => {
-        if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
-          this.pay()
-          this.setState({ room: res.data.resultInfo[0].rmno})
-        } else {
-          Taro.showToast({
-            title: '无可用房间，请联系酒店前台',
-            icon: 'none'
-          })
-          return 
-        }
-      },
-      fail: () => {
-        Taro.showToast({
-          title: '请求失败',
-          icon:'none'
-        })
-      }
-    })
-  }
-  //成元单排房
-  check = () => {
-    Taro.request({
-      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmno/assign',
-      header: {
-        'Content-Type': 'application/json',
-        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-      },
-      method: 'POST',
-      data: {
-        "hotelGroupCode": "EDBG",
-        "hotelCode": "EDB1",
-        masterId: this.state.getinfo[0].id,
-        rmno:this.state.room
-      },
-      dataType: 'json',
-      success: (res) => {
-        if (res.data && res.data.resultCode === 0) {
-          this.checkin()
-        } else {
-          Taro.showToast({
-            title: '已入住状态',
-            icon:'none'
-          })
-          return 
-        }
-      },
-      fail: () => {
-        Taro.showToast({
-          title: '请求失败',
-          icon:'none'
-        })
-      }
-    })
-  }
-  //成员单登记入住
-  checkin = () => {
-    Taro.request({
-      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/checkin',
-      header: {
-        'Content-Type': 'application/json',
-        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-      },
-      method: 'POST',
-      data: {
-        "hotelGroupCode": "EDBG",
-        "hotelCode": "EDB1",
-        masterId: this.state.getinfo[0].id,
-      },
-      dataType: 'json',
-      success: (res) => {
-        if (res.data && res.data.resultCode === 0) {
-          Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
-        } else {
-          Taro.showToast({
-            title: '入住失败 请联系酒店前台',
-            icon: 'none'
-          })
-          return 
-        }
-      },
-      fail: () => {
-        Taro.showToast({
-          title: '请求失败',
-          icon:'none'
-        })
-      }
-    })
-  }
-  //获取tardeNo
-  pay = () => {
-    Taro.request({
-      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
-      header: {
-        'Content-Type': 'application/json',
-        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-      },
-      method: 'POST',
-      data: {
-        "hotelGroupCode": "EDBG",
-        "hotelCode": "EDB1",
-        subject: this.state.getinfo[0].rmtype,
-        masterId: this.state.getinfo[0].id,
-        totalFee: this.state.money.nonPay,
-        buyerId: this.state.appid
-      },
-      dataType: 'json',
-      success: (res) => {
-        if (res.data && res.data.resultCode === 0) {
-          //唤起收银台
-         this.success(res.data.resultInfo)
-        } else {
-          Taro.showToast({
-            title: '付款失败'
-          })
-          return
-        }
-      },
-      fail: () => {
-        Taro.showToast({
-          title: '请求失败',
-          icon:'none'
-        })
-      }
-    })
-  }
-  //唤起收银台
-  success = (trade) => {
-    my.tradePay({
-      tradeNO: trade,
-      success: (res) => {
-        if (res.result && res.memo === "") {
-          //付款成功 排房
-          this.check()
-        }
-      },
-      fail: (res) => {
-        Taro.showToast({
-          title: '请求失败',
-          icon: 'none'
-        })
-        return
-      }
-    });
-  }
-  test = () => {
-    Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}&appid=${this.state.appid}` })
-  }
-  render() {
-    const items = [
-      { 'title': '房间选择' },
-      { 'title': '登记确认' },
-      { 'title': '登记成功' }
-    ]
-    return (
-      <View>
-        <View className='registration'>
-          {/* 步骤条 */}
-          <AtSteps
-            items={items}
-            current={this.state.current}
-          />
-          {/* 登记确认 */}
-          <AtCard>
-            <View className='at-article '>
-              <Text >绿云大酒店</Text>
-              <Text className='at-article disthapp '>1003</Text>
-            </View>
-            <View className='at-article '>
-              <View className='at-article '>入住：{this.state.getinfo[0].arr}</View>
-              <View className='at-article '>离店：{this.state.getinfo[0].dep}
-                {/* <Text className='at-article disth'>共{this.stata.rmnum}晚</Text> */}
-              </View>
-            </View>
-          </AtCard>
-          <View className='at-article'>
-            <Text className='at-article__h3 at-article'>入住人</Text>
-            <Text className='person at-article ' onClick={this.test}>添加同住人</Text>
-          </View>
-          <View className='line'></View>
-          {/* 同住人信息 */}
-          {this.state.getinfo && this.state.getinfo.map((item, index) => {
-            return <View>
-              <View className='at-article__p'>入住人：{item.name}</View>
-              <View className='at-article__p'>手机号：{item.mobile || this.state.mobile }</View>
-              <View className='at-article__p'>身份证：{item.idNo || item.idcard}</View>
-              <View className='line'></View>
-            </View>
-          })}
-          {/* 费用明细 */}
-          <View style="margin:30px 10px 0 10px;">
-            <unify-pay
-              userId={this.state.appid}
-              serviceId='2019122400000000000003655000'
-              onClick={(e) => {
-                if (e.preFreeze) {
-                  
-                } else {
-                  Taro.request({
-                    url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
-                    header: {
-                      'Content-Type': 'application/json',
-                      'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-                    },
-                    method: 'POST',
-                    data: {
-                      "hotelGroupCode": "EDBG",
-                      "hotelCode": "EDB1",
-                      subject: this.state.getinfo[0].rmtype,
-                      masterId: this.state.getinfo[0].id,
-                      totalFee: this.state.money.nonPay,
-                      buyerId: this.state.appid
-                    },
-                    dataType: 'json',
-                    success: res => {
-                      console.log(res,'tardeNo')
-                    }
-                  })
+    state = {
+        current: 1,
+        status: false,
+        hasBorder: false,
+        getinfo: null,  //订单信息
+        money: '',  //支付信息
+        appid: '', //用户id
+        mobile: '',  //手机号
+        room: '',  //房间码
+        username: '',  //真实姓名
+        rmnum: ''
+    }
+    componentWillMount() {
+        list = [...list, JSON.parse(this.$router.params.info)];
+        this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, rmnum: this.$router.params.rmnum })
+        this.getMoney(list[0].id)
+    }
+    getMoney = (id) => {
+        Taro.request({
+            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmfee/nonpay',
+            header: {
+                'Content-Type': 'application/json',
+                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+            },
+            method: 'POST',
+            data: {
+                "hotelGroupCode": "EDBG",
+                "hotelCode": "EDB1",
+                masterId: id
+            },
+            success: (res) => {
+                if (res.data && res.data.resultCode === 0) {
+                    this.setState({ isLoading: false, money: res.data.resultInfo })
                 }
-              }}
-            />
-          </View>
-          {/* <View className='momey'>
+            },
+            fail: () => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+            }
+        })
+    }
+    list = () => {
+        //查询可用房间
+        Taro.request({
+            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/avail/rmno/list',
+            header: {
+                'Content-Type': 'application/json',
+                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+            },
+            method: 'POST',
+            data: {
+                "hotelGroupCode": "EDBG",
+                "hotelCode": "EDB1",
+                rmtype: this.state.getinfo[0].rmtype,
+                arr: this.state.getinfo[0].arr,
+                dep: this.state.getinfo[0].dep
+            },
+            dataType: 'json',
+            success: (res) => {
+                if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
+                    this.pay()
+                    this.setState({ room: res.data.resultInfo[0].rmno })
+                } else {
+                    Taro.showToast({
+                        title: '无可用房间，请联系酒店前台',
+                        icon: 'none'
+                    })
+                    return
+                }
+            },
+            fail: () => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+            }
+        })
+    }
+    //成元单排房
+    check = () => {
+        Taro.request({
+            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmno/assign',
+            header: {
+                'Content-Type': 'application/json',
+                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+            },
+            method: 'POST',
+            data: {
+                "hotelGroupCode": "EDBG",
+                "hotelCode": "EDB1",
+                masterId: this.state.getinfo[0].id,
+                rmno: this.state.room
+            },
+            dataType: 'json',
+            success: (res) => {
+                if (res.data && res.data.resultCode === 0) {
+                    this.checkin()
+                } else {
+                    Taro.showToast({
+                        title: '已入住状态',
+                        icon: 'none'
+                    })
+                    return
+                }
+            },
+            fail: () => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+            }
+        })
+    }
+    //成员单登记入住
+    checkin = () => {
+        Taro.request({
+            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/checkin',
+            header: {
+                'Content-Type': 'application/json',
+                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+            },
+            method: 'POST',
+            data: {
+                "hotelGroupCode": "EDBG",
+                "hotelCode": "EDB1",
+                masterId: this.state.getinfo[0].id,
+            },
+            dataType: 'json',
+            success: (res) => {
+                if (res.data && res.data.resultCode === 0) {
+                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
+                } else {
+                    Taro.showToast({
+                        title: '入住失败 请联系酒店前台',
+                        icon: 'none'
+                    })
+                    return
+                }
+            },
+            fail: () => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+            }
+        })
+    }
+    //获取tardeNo
+    pay = () => {
+        Taro.request({
+            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
+            header: {
+                'Content-Type': 'application/json',
+                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+            },
+            method: 'POST',
+            data: {
+                "hotelGroupCode": "EDBG",
+                "hotelCode": "EDB1",
+                subject: this.state.getinfo[0].rmtype,
+                masterId: this.state.getinfo[0].id,
+                totalFee: this.state.money.nonPay,
+                buyerId: this.state.appid
+            },
+            dataType: 'json',
+            success: (res) => {
+                if (res.data && res.data.resultCode === 0) {
+                    //唤起收银台
+                    this.success(res.data.resultInfo)
+                } else {
+                    Taro.showToast({
+                        title: '付款失败'
+                    })
+                    return
+                }
+            },
+            fail: () => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+            }
+        })
+    }
+    //唤起收银台
+    success = (trade) => {
+        my.tradePay({
+            tradeNO: trade,
+            success: (res) => {
+                console.log(res, '唤起收银台')
+                if (res.result && res.memo === "") {
+                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
+                }
+            },
+            fail: () => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+                return
+            }
+        });
+    }
+    test = () => {
+        Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}&appid=${this.state.appid}` })
+    }
+    orderStr = (order) => {
+        console.log(order)
+        my.tradePay({
+            orderStr:order,
+            success: (res) => {
+                console.log(res, '唤起收银台')
+                if (res.result && res.memo === "") {
+                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
+                }
+            },
+            fail: (res) => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+                return
+            }
+        });
+    }
+    render() {
+        const items = [
+            { 'title': '房间选择' },
+            { 'title': '登记确认' },
+            { 'title': '登记成功' }
+        ]
+        return (
+            <View>
+                <View className='registration'>
+                    {/* 步骤条 */}
+                    <AtSteps
+                        items={items}
+                        current={this.state.current}
+                    />
+                    {/* 登记确认 */}
+                    <AtCard>
+                        <View className='at-article '>
+                            <Text >绿云大酒店</Text>
+                            <Text className='at-article disthapp '>1003</Text>
+                        </View>
+                        <View className='at-article '>
+                            <View className='at-article '>入住：{this.state.getinfo[0].arr}</View>
+                            <View className='at-article '>离店：{this.state.getinfo[0].dep}
+                                {/* <Text className='at-article disth'>共{this.stata.rmnum}晚</Text> */}
+                            </View>
+                        </View>
+                    </AtCard>
+                    <View className='at-article'>
+                        <Text className='at-article__h3 at-article'>入住人</Text>
+                        <Text className='person at-article ' onClick={this.test}>添加同住人</Text>
+                    </View>
+                    <View className='line'></View>
+                    {/* 同住人信息 */}
+                    {this.state.getinfo && this.state.getinfo.map((item, index) => {
+                        return <View>
+                            <View className='at-article__p'>{index===0 ? '入住人' : '同住人'}：{item.name}</View>
+                            <View className='at-article__p'>手机号：{item.mobile || this.state.mobile}</View>
+                            <View className='at-article__p'>身份证：{item.idNo || item.idcard}</View>
+                            <View className='line'></View>
+                        </View>
+                    })}
+                    {/* 费用明细 */}
+                    <View style="margin:30px 10px 0 10px;">
+                        <unify-pay
+                            userId={this.state.appid}
+                            serviceId='2019122400000000000003655000'
+                            onClick={(e) => {
+                                if (e.preFreeze) {
+                                    console.log( '订单号',this.state.getinfo[0].id)
+                                    Taro.request({
+                                        url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/getunifypay',
+                                        header: {
+                                            'Content-Type': 'application/json',
+                                            'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+                                        },
+                                        method: 'POST',
+                                        data: {
+                                            "hotelGroupCode": "EDBG",
+                                            "hotelCode": "EDB1",
+                                            masterId: this.state.getinfo[0].id,
+                                            subject: this.state.getinfo[0].rmtype,
+                                            // totalFee: this.state.money.nonPay,
+                                            totalFee: 0.01,
+                                            isPreFreeze: 'T',
+                                            buyerId: this.state.appid
+                                        },
+                                        dataType: 'json',
+                                        success: res => {
+                                            console.log(res,'orderStr')
+                                            this.orderStr(res.data.resultInfo)
+                                        }
+                                    })
+
+                                } else {
+                                    Taro.request({
+                                        url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
+                                        header: {
+                                            'Content-Type': 'application/json',
+                                            'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+                                        },
+                                        method: 'POST',
+                                        data: {
+                                            "hotelGroupCode": "EDBG",
+                                            "hotelCode": "EDB1",
+                                            subject: this.state.getinfo[0].rmtype,
+                                            masterId: this.state.getinfo[0].id,
+                                            totalFee: 0.01,
+                                            // totalFee: this.state.money.nonPay,
+                                            buyerId: this.state.appid
+                                        },
+                                        dataType: 'json',
+                                        success: res => {
+                                            console.log(res, 'tardeNo')
+                                            this.success(res.data.resultInfo)
+                                        }
+                                    })
+                                }
+                            }}
+                        />
+                    </View>
+                    {/* <View className='momey'>
             <Text onClick={() => { this.setState({ status: !this.state.status }) }}>
               <Text className='money_r'>{`￥${this.state.money && this.state.money.nonPay}`}</Text>
               <Text className='money_t'>明细</Text>
@@ -316,8 +361,8 @@ export default class Index extends Component {
             <AtIcon value='chevron-up' size='20' color='#666' className='icon'></AtIcon>
             <Text className='money_p' onClick={this.list}>确认登记并支付押金</Text>
           </View> */}
-        </View>
-      </View>
-    )
-  }
+                </View>
+            </View>
+        )
+    }
 }
