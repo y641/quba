@@ -11,13 +11,89 @@ export default class Index extends Component {
   state = {
    current: 3,
     getinfo: null,
-   money:null
+      money: null,
+      rmno:''
   }
-  componentWillMount() {
+    componentWillMount() {
+      console.log(this.$router.params)
    let info = JSON.parse(this.$router.params.info)
    console.log(info,'你好好好')
-   this.setState({getinfo:info})
-  }
+        this.setState({ getinfo: info, rmno: this.$router.params.rmno})
+    }
+    componentDidMount() {
+        this.check()
+    }
+    //成元单排房
+    check = () => {
+        Taro.request({
+            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmno/assign',
+            header: {
+                'Content-Type': 'application/json',
+                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+            },
+            method: 'POST',
+            data: {
+                "hotelGroupCode": "EDBG",
+                "hotelCode": "EDB1",
+                masterId: this.state.getinfo[0].id,
+                rmno: this.state.rmno
+            },
+            dataType: 'json',
+            success: (res) => {
+                console.log(res,'排房')
+                if (res.data && res.data.resultCode === 0) {
+                    this.checkin()
+                } else {
+                    Taro.showToast({
+                        title: '已入住状态',
+                        icon: 'none'
+                    })
+                    return
+                }
+            },
+            fail: () => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+            }
+        })
+    }
+    //成员单登记入住
+    checkin = () => {
+        Taro.request({
+            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/checkin',
+            header: {
+                'Content-Type': 'application/json',
+                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
+            },
+            method: 'POST',
+            data: {
+                "hotelGroupCode": "EDBG",
+                "hotelCode": "EDB1",
+                masterId: this.state.getinfo[0].id,
+            },
+            dataType: 'json',
+            success: (res) => {
+                console.log(res,'成员单入住')
+                if (res.data && res.data.resultCode === 0) {
+                    console.log(res,'入住成功')
+                } else {
+                    Taro.showToast({
+                        title: '入住失败 请联系酒店前台',
+                        icon: 'none'
+                    })
+                    return
+                }
+            },
+            fail: () => {
+                Taro.showToast({
+                    title: '请求失败',
+                    icon: 'none'
+                })
+            }
+        })
+    }
   render() {
     const items = [
       { 'title': '房间选择' },

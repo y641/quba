@@ -17,7 +17,7 @@ export default class Index extends Component {
   }
   getCode = () => {
     my.getAuthCode({
-        scopes: 'auth_base',
+        scopes: 'auth_user',
       success: (res) => {
         console.log(res,'res')
         this.mebme(res.authCode)

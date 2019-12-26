@@ -14,7 +14,6 @@ export default class Index extends Component {
     }
     state = {
         current: 1,
-        status: false,
         hasBorder: false,
         getinfo: null,  //订单信息
         money: '',  //支付信息
@@ -26,6 +25,7 @@ export default class Index extends Component {
     }
     componentWillMount() {
         list = [...list, JSON.parse(this.$router.params.info)];
+        console.log(list,'list')
         this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, rmnum: this.$router.params.rmnum })
         this.getMoney(list[0].id)
     }
@@ -73,15 +73,11 @@ export default class Index extends Component {
             },
             dataType: 'json',
             success: (res) => {
-                if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
-                    this.pay()
-                    this.setState({ room: res.data.resultInfo[0].rmno })
-                } else {
-                    Taro.showToast({
-                        title: '无可用房间，请联系酒店前台',
-                        icon: 'none'
-                    })
-                    return
+                console.log(res, '查询可用房')
+                if (res.data && res.data.resultInfo.length > 0) {
+                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}&rmno=${res.data.resultInfo[0].rmno}` })
+                } else if (res.data.resultInfo.length === 0) {
+                    Taro.navigateTo({url:'/pages/without/without'})
                 }
             },
             fail: () => {
@@ -92,112 +88,7 @@ export default class Index extends Component {
             }
         })
     }
-    //成元单排房
-    check = () => {
-        Taro.request({
-            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/rmno/assign',
-            header: {
-                'Content-Type': 'application/json',
-                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-            },
-            method: 'POST',
-            data: {
-                "hotelGroupCode": "EDBG",
-                "hotelCode": "EDB1",
-                masterId: this.state.getinfo[0].id,
-                rmno: this.state.room
-            },
-            dataType: 'json',
-            success: (res) => {
-                if (res.data && res.data.resultCode === 0) {
-                    this.checkin()
-                } else {
-                    Taro.showToast({
-                        title: '已入住状态',
-                        icon: 'none'
-                    })
-                    return
-                }
-            },
-            fail: () => {
-                Taro.showToast({
-                    title: '请求失败',
-                    icon: 'none'
-                })
-            }
-        })
-    }
-    //成员单登记入住
-    checkin = () => {
-        Taro.request({
-            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/item/checkin',
-            header: {
-                'Content-Type': 'application/json',
-                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-            },
-            method: 'POST',
-            data: {
-                "hotelGroupCode": "EDBG",
-                "hotelCode": "EDB1",
-                masterId: this.state.getinfo[0].id,
-            },
-            dataType: 'json',
-            success: (res) => {
-                if (res.data && res.data.resultCode === 0) {
-                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
-                } else {
-                    Taro.showToast({
-                        title: '入住失败 请联系酒店前台',
-                        icon: 'none'
-                    })
-                    return
-                }
-            },
-            fail: () => {
-                Taro.showToast({
-                    title: '请求失败',
-                    icon: 'none'
-                })
-            }
-        })
-    }
-    //获取tardeNo
-    pay = () => {
-        Taro.request({
-            url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/gettradeno',
-            header: {
-                'Content-Type': 'application/json',
-                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-            },
-            method: 'POST',
-            data: {
-                "hotelGroupCode": "EDBG",
-                "hotelCode": "EDB1",
-                subject: this.state.getinfo[0].rmtype,
-                masterId: this.state.getinfo[0].id,
-                totalFee: this.state.money.nonPay,
-                buyerId: this.state.appid
-            },
-            dataType: 'json',
-            success: (res) => {
-                if (res.data && res.data.resultCode === 0) {
-                    //唤起收银台
-                    this.success(res.data.resultInfo)
-                } else {
-                    Taro.showToast({
-                        title: '付款失败'
-                    })
-                    return
-                }
-            },
-            fail: () => {
-                Taro.showToast({
-                    title: '请求失败',
-                    icon: 'none'
-                })
-            }
-        })
-    }
+
     //唤起收银台
     success = (trade) => {
         my.tradePay({
@@ -205,7 +96,7 @@ export default class Index extends Component {
             success: (res) => {
                 console.log(res, '唤起收银台')
                 if (res.result && res.memo === "") {
-                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
+                    this.list()
                 }
             },
             fail: () => {
@@ -221,16 +112,15 @@ export default class Index extends Component {
         Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}&appid=${this.state.appid}` })
     }
     orderStr = (order) => {
-        console.log(order)
         my.tradePay({
             orderStr:order,
             success: (res) => {
                 console.log(res, '唤起收银台')
                 if (res.result && res.memo === "") {
-                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}` })
+                   this.list()
                 }
             },
-            fail: (res) => {
+            fail: () => {
                 Taro.showToast({
                     title: '请求失败',
                     icon: 'none'
@@ -257,7 +147,6 @@ export default class Index extends Component {
                     <AtCard>
                         <View className='at-article '>
                             <Text >绿云大酒店</Text>
-                            <Text className='at-article disthapp '>1003</Text>
                         </View>
                         <View className='at-article '>
                             <View className='at-article '>入住：{this.state.getinfo[0].arr}</View>
@@ -287,7 +176,6 @@ export default class Index extends Component {
                             serviceId='2019122400000000000003655000'
                             onClick={(e) => {
                                 if (e.preFreeze) {
-                                    console.log( '订单号',this.state.getinfo[0].id)
                                     Taro.request({
                                         url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/alipay/getunifypay',
                                         header: {
@@ -307,7 +195,6 @@ export default class Index extends Component {
                                         },
                                         dataType: 'json',
                                         success: res => {
-                                            console.log(res,'orderStr')
                                             this.orderStr(res.data.resultInfo)
                                         }
                                     })
@@ -331,7 +218,6 @@ export default class Index extends Component {
                                         },
                                         dataType: 'json',
                                         success: res => {
-                                            console.log(res, 'tardeNo')
                                             this.success(res.data.resultInfo)
                                         }
                                     })
@@ -339,28 +225,6 @@ export default class Index extends Component {
                             }}
                         />
                     </View>
-                    {/* <View className='momey'>
-            <Text onClick={() => { this.setState({ status: !this.state.status }) }}>
-              <Text className='money_r'>{`￥${this.state.money && this.state.money.nonPay}`}</Text>
-              <Text className='money_t'>明细</Text>
-              {this.state.status ? <AtFloatLayout isOpened title="费用明细">
-                <View className='at-row at-row__justify--between'>
-                  <View className='at-col at-col-9'>{this.state.getinfo[0].arr}</View>
-                  <View className='at-col at-col-2'>{`￥${this.state.money.rmFeeTtl}`}</View>
-                </View>
-                <View className='at-row at-row__justify--between'>
-                  <View className='at-col at-col-9'>{this.state.getinfo[0].dep}</View>
-                  <View className='at-col at-col-2'>{`￥${this.state.money.rmFeeTtl}`}</View>
-                </View>
-                <View className='at-row at-row__justify--end'>
-                  <View className='at-col at-col-5'></View>
-                  <View className='at-col at-col-5'>{`订单总计：￥${this.state.money.nonPay}`}</View>
-                </View>
-              </AtFloatLayout> : null}
-            </Text>
-            <AtIcon value='chevron-up' size='20' color='#666' className='icon'></AtIcon>
-            <Text className='money_p' onClick={this.list}>确认登记并支付押金</Text>
-          </View> */}
                 </View>
             </View>
         )
