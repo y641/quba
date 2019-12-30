@@ -1,6 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtSteps, AtButton, AtDivider } from 'taro-ui'
+import AppData from '../utils/utils'
 import './me.scss'
 
 export default class Me extends Component{
@@ -11,7 +12,8 @@ export default class Me extends Component{
         getinfo: null,
         current:0
     }
-  componentWillMount() {
+    componentWillMount() {
+      console.log(AppData.orderdatails,'me')
    this.getCode()
     }
     getCode = () => {

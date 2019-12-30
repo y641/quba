@@ -24,7 +24,9 @@ export default class Index extends Component {
         rmnum: ''
     }
     componentWillMount() {
-        list = [...list, JSON.parse(this.$router.params.info)];
+        console.log(this.$router.params,'B')
+        if (this.$router.params.num === '1') { list = [JSON.parse(this.$router.params.info)] }
+        else { list = [...list, JSON.parse(this.$router.params.info)]}
         console.log(list,'list')
         this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, rmnum: this.$router.params.rmnum })
         this.getMoney(list[0].id)
@@ -164,7 +166,7 @@ export default class Index extends Component {
                     {this.state.getinfo && this.state.getinfo.map((item, index) => {
                         return <View>
                             <View className='at-article__p'>{index===0 ? '入住人' : '同住人'}：{item.name}</View>
-                            <View className='at-article__p'>手机号：{item.mobile || this.state.mobile}</View>
+                            <View className='at-article__p'>手机号：{(item.mobile || this.state.mobile) ? (item.mobile || this.state.mobile) : null}</View>
                             <View className='at-article__p'>身份证：{item.idNo || item.idcard}</View>
                             <View className='line'></View>
                         </View>

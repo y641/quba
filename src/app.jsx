@@ -1,7 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
 import Index from './pages/index/index'
 import 'taro-ui/dist/style/index.scss'
-
 import './app.scss'
 
 class App extends Component {
@@ -44,7 +43,7 @@ class App extends Component {
         "version": "*",
         "provider": "2019112669415926"
       },
-    }
+      }
   }
 
   // 在 App 类中的 render() 函数没有实际作用

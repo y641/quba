@@ -1,6 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Swiper, SwiperItem, Image } from '@tarojs/components'
 import { AtList, AtListItem, AtCard, AtDivider } from 'taro-ui'
+import  AppData  from '../utils/utils'
 import './index.scss'
 
 export default class Index extends Component {
@@ -100,11 +101,12 @@ export default class Index extends Component {
         //通过身份证没有查询到成员单
         console.log(res,'身份证查询')
         if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length === 0) {
-          //按照姓名查询成员单  
+          //按照姓名查询成员单 
           this.inquiryName()
         } else {
+            AppData.orderdatails=res.data.resultInfo
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}` })
+          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
         }
       },
       fail: (res) => {
@@ -139,7 +141,7 @@ export default class Index extends Component {
           this.phone() 
         } else {
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}`})
+            Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}`})
         }
       },
       fail: (res) => {
@@ -173,7 +175,7 @@ export default class Index extends Component {
           this.inquiryPredetermined()
         } else {
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo[0])}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}` })
+            Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
         }
       },
       fail: () => {
@@ -205,8 +207,9 @@ export default class Index extends Component {
       success: (res) => {
         console.log(res, '身份证查询预定单')
         if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
-          //按照身份证查询到预定单 ,查询到预订单 拆分
-          this.getContnet(res.data.resultInfo[0])
+          //按照身份证查询到预定单 ,查询到预订单
+            Taro.hideLoading()
+            Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
         } else {
           //按照姓名查询预定单
           this.inquiry()
@@ -239,9 +242,9 @@ export default class Index extends Component {
       dataType: 'json',
       success: (res) => {
         console.log(res, '姓名查询预定单')
-        if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
-          this.setState({ rmnum: res.data.resultInfo[0].rmnum})
-          this.getContnet(res.data.resultInfo[0])
+          if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
+            Taro.hideLoading()
+              Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
         } else {
           //按照手机号查询预订单
           this.mobile()
@@ -272,16 +275,15 @@ export default class Index extends Component {
       dataType: 'json',
       success: (res) => {
         console.log(res,'手机号查询预订单')
-        if (res.data && res.data.resultInfo.length > 0) {
-          console.log('hahahhab')
-          this.getContnet(res.data.resultInfo[0])
-        } else {
+          if (res.data && res.data.resultInfo.length > 0) {
+            Taro.hideLoading()
+              Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
+        } else if(res.data && res.data.resultInfo.length===0){
+         Taro.hideLoading()
           Taro.showToast({
             title: '没有查询到订单',
             icon:'none'
           })
-          Taro.hideLoading()
-          return
         }
       },
       fail: () => {
@@ -294,51 +296,7 @@ export default class Index extends Component {
       }
     })
   }
-  //拆分预定单
-  getContnet = (info) => {
-    let gender = this.state.getinfo.gender
-    if (gender === 'f') {
-      gender='女'
-    } else if (gender === 'm') {
-      gender='男'
-    }
-    console.log(this.state.getinfo.gender)
-    Taro.request({
-      url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/src/split/one',
-      header: {
-        'Content-Type': 'application/json',
-        'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-      },
-      method: 'POST',
-      data: {
-        "hotelGroupCode": "EDBG",
-        "hotelCode": "EDB1",
-        mobile: this.state.getinfo.mobile,
-        rsvSrcId: info.rsvSrcId,
-        name: info.rsvMan,
-        idNo: this.state.getinfo.certNo,
-        sex:gender,
-        idCode: '01',
-        address: this.state.getinfo.city
-      },
-      dataType: 'json',
-      success: (res) => {
-        console.log(res, '拆分成员单')
-        if (res.data && res.data.resultCode === 0) {
-          Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&rmnum=${info.rmnum}` })
-        }
-      },
-      fail: (res) => {
-        Taro.hideLoading()
-        Taro.showToast({
-          title: '请求失败',
-          icon:'none'
-        })
-        return
-      }
-    })
-  }
+
   doClick = () => {
     Taro.showLoading({
       title: '匹配中'
