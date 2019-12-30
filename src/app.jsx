@@ -6,8 +6,10 @@ import './app.scss'
 class App extends Component {
 
   config = {
-    pages: [
-        'pages/index/index',
+      pages: [
+          'pages/index/index',
+          'pages/not_found/not_found',
+        'pages/mate/mate',
         'pages/without/without',
       'pages/order_check/order_check',
       'pages/registration/registration',
