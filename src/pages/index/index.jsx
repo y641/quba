@@ -104,9 +104,8 @@ export default class Index extends Component {
           //按照姓名查询成员单 
           this.inquiryName()
         } else {
-            AppData.orderdatails=res.data.resultInfo
           Taro.hideLoading()
-          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
+          Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.gender}` })
         }
       },
       fail: (res) => {
@@ -209,7 +208,7 @@ export default class Index extends Component {
         if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
           //按照身份证查询到预定单 ,查询到预订单
             Taro.hideLoading()
-            Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
+            Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.gender}` })
         } else {
           //按照姓名查询预定单
           this.inquiry()
@@ -244,7 +243,7 @@ export default class Index extends Component {
         console.log(res, '姓名查询预定单')
           if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
             Taro.hideLoading()
-              Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
+              Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.gender}` })
         } else {
           //按照手机号查询预订单
           this.mobile()

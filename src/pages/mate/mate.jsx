@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtSegmentedControl, AtButton, AtInput, AtForm } from 'taro-ui'
-import '../mate.scss'
+import { SplitMember } from '../utils/utils'
 
 export default class Mate extends Component {
     config = {
@@ -10,18 +10,99 @@ export default class Mate extends Component {
     state = {
         cuurent: 0,
         mate: '',
-        phone:''
+        phone: '',
+        info: null,
+        idcard: '',
+        sex: '',
+        appid:''
     }
-    handleClick=(value)=> {
+    componentWillMount() {
+        let info = JSON.parse(this.$router.params.info)
+        console.log(info)
+        this.setState({appid:this.$router.params.appid, info, idcard: this.$router.params.idcard, sex: this.$router.params.sex })
+    }
+    handleClick = (value) => {
         this.setState({
             current: value
         })
     }
     handleChange = (value) => {
-        this.setState({ mate: value})
+        this.setState({ mate: value })
     }
-    doChange = () => {
-        this.setState({phone:value})
+    doChange = (value) => {
+        this.setState({ phone: value })
+    }
+    doClick = () => {
+        if (this.state.info.rsvNo === this.state.mate) {
+            let gender = ''
+            if (this.state.sex === 'f') {
+                gender = '女'
+            } else {
+                gender = "男"
+            }
+            //拆分成员单
+            if (this.state.info.rsvSrcId) {
+                SplitMember({
+                    mobile: this.state.info.mobile,
+                    rsvSrcId: this.state.info.rsvSrcId,
+                    name: this.state.info.rsvMan,
+                    idNo: this.state.idcard,
+                    sex: gender,
+                    idCode: '01',
+                }, (res) => {
+                    console.log(res, '拆分成员单跳转')
+                    Taro.navigateTo({
+                        url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                    })
+                })
+            } else {
+                Taro.navigateTo({
+                    url: `/pages/registration/registration?info=${JSON.stringify(this.state.info)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                })
+            }
+           
+
+        } else {
+            Taro.showToast({
+                title: '预订单号输入错误',
+                icon: 'none'
+            })
+        }
+    }
+    handle = () => {
+        let gender = ''
+        if (this.state.sex === 'f') {
+            gender = '女'
+        } else {
+            gender = "男"
+        }
+        let mobile = this.state.info.mobile.substring(7)
+        if (mobile === this.state.phone) {
+            if (this.state.info.rsvSrcId) {
+                SplitMember({
+                    mobile: this.state.info.mobile,
+                    rsvSrcId: this.state.info.rsvSrcId,
+                    name: this.state.info.rsvMan,
+                    idNo: this.state.info.idNo,
+                    sex: gender,
+                    idCode: '01',
+                }, (res) => {
+                    Taro.navigateTo({
+                        url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                    })
+                })
+            } else {
+                console.log('不是预订单')
+                Taro.navigateTo({
+                    url: `/pages/registration/registration?info=${JSON.stringify(this.state.info)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                })
+            }
+        } else {
+            Taro.showToast({
+                title: '输入错误',
+                icon: 'none'
+            })
+        }
     }
     render() {
         return (
@@ -33,7 +114,7 @@ export default class Mate extends Component {
                         current={this.state.current}
                     />
                     {
-                        this.state.current === 0
+                        this.state.current === 0 
                             ? <View className='tab-content'>
                                 <AtForm>
                                     <AtInput
@@ -65,9 +146,11 @@ export default class Mate extends Component {
                             : null
                     }
                 </View>
-                <View style='margin:100px 20px 0 20px'>
-                    <AtButton type='primary'>确认匹配</AtButton>
-                </View>
+                {this.state.current === 0 ? <View style='margin:100px 20px 0 20px'>
+                    <AtButton type='primary' onClick={this.doClick}>确认匹配</AtButton>
+                </View> : <View style='margin:100px 20px 0 20px'>
+                        <AtButton type='primary' onClick={this.handle}>确认匹配</AtButton>
+                    </View>}
             </View>
         )
     }
