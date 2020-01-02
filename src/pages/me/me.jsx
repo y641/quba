@@ -96,7 +96,7 @@ export default class Me extends Component {
                 //查到
                 this.setState({ orderinfo: res.data.resultInfo })
             }
-        }, () => { Taro.showToast({ title: '请求失败', icon: 'none' }) })
+        })
     }
 
     //身份证查询预订单
@@ -112,7 +112,7 @@ export default class Me extends Component {
                 //按照姓名查询预定单
                 this.inquiryUserName()
             }
-        }, () => { Taro.showToast({ title: '请求失败', icon: 'none' }) })
+        })
     }
     //姓名查询预订单
     inquiryUserName = () => {
@@ -126,7 +126,7 @@ export default class Me extends Component {
                     //按照手机号查询预订单
                     this.inquiryMobile()
                 }
-            }, () => { Taro.showToast({ title: '请求失败', icon: 'none' }) }
+            }
         )
     }
 
@@ -137,7 +137,7 @@ export default class Me extends Component {
                 //查到
                 this.setState({ orderinfo: res.data.resultInfo })
             }
-        }, () => { Taro.showToast({ title: '请求失败', icon: 'none' }) })
+        })
     }
     retreatRoom = () => {
         Taro.showModal({

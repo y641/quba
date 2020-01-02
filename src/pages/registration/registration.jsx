@@ -82,7 +82,6 @@ export default class Index extends Component {
         my.tradePay({
             orderStr:order,
             success: (res) => {
-                console.log(res, '唤起收银台')
                 if (res.result && res.memo === "") {
                    this.list()
                 }

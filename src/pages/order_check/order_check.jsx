@@ -85,13 +85,14 @@ export default class Index extends Component {
             { 'title': '登记确认' },
             { 'title': '登记成功' }
         ]
+        const {mobile}=this.state
         return (
             <View className='order_check'>
                 {/* 步骤条 */}
                 <AtSteps
                     items={items}
                     current={this.state.current}
-                    onChange={this.onChange}
+                    onChange={()=>{}}
                 />
                 {/* 预定信息 */}
                 {this.state.order ? this.state.order.map((item, index) => {
@@ -108,7 +109,7 @@ export default class Index extends Component {
                                 <View>
                                     <icon type="success" size='30' className='icon' color={index === this.state.currentIndex ? '#6190E8' : '#ddd'} />
                                 </View>
-                                <View className='at-article'>联系电话：{item.mobile || this.state.mobile}</View>
+                                <View className='at-article'>联系电话：{item.mobile || mobile}</View>
                                 <View className='at-article'>入住日期：{item.arr}</View>
                                 <View className='at-article'>离店日期：{item.dep}</View>
                                 <View className='at-article'>入住房型：{item.rmtype}</View>
@@ -117,7 +118,7 @@ export default class Index extends Component {
                         </View>
                     )
                 }) : null}
-                {this.state.order.length === 1 ? <View className='at-article'>
+                {this.state.order &&  this.state.order.length===1 ? <View className='at-article'>
                     <AtButton type='primary' onClick={this.handle}>确认选择</AtButton>
                 </View> : <View className='at-article'>
                         <AtButton type='primary' onClick={this.choose}>确认选择</AtButton>
