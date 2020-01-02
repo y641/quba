@@ -1,6 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text, Picker } from '@tarojs/components'
 import { AtInput, AtForm, AtIcon, AtButton } from 'taro-ui'
+import { addperson} from '../utils/utils'
 import './add_check.scss'
 
 var info = []
@@ -18,10 +19,9 @@ export default class Index extends Component {
     appid: ''
   }
   componentWillMount() {
-    console.log(this.$router.params)
+    console.log(this.$router.params,'haha')
     info = [...info,this.$router.params.info]
     let getinfo = JSON.parse(info[0])
-    console.log(getinfo,'getinfo')
     this.setState({ getinfo, appid:this.$router.params.appid })
   }
   onChange = e => {
@@ -60,32 +60,33 @@ export default class Index extends Component {
       )
       return
     } else {
-      Taro.request({
-        url: 'https://openapidev.ipms.cn/igroup/edbg/openapi/v1/order/src/masteradd',
-        header: {
-          'Content-Type': 'application/json',
-          'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-        },
-        method: 'POST',
-        data: {
-          "hotelGroupCode": "EDBG",
-          "hotelCode": "EDB1",
-          name: this.state.name,
-          sex: '女',
-          idCode: '01',
-          idNo: this.state.idCard,
-          masterId: this.state.getinfo.id
-        },
-        dataType: 'json',
-        success: (res) => {
-          console.log(res, '添加同住人')
-          Taro.navigateTo({
-            url: `/pages/registration/registration?info=${JSON.stringify({
-              name: this.state.name, mobile: this.state.mobile, selector: this.state.selectorChecked, idcard: this.state.idCard
-            })}&appid=${this.state.appid}&num=3`
-          })
-        }
-      })
+        addperson({
+            name: this.state.name,
+            sex: '女',
+            idCode: '01',
+            idNo: this.state.idCard,
+            masterId: this.state.getinfo.id
+        }, (res) => {
+                if (res.data && res.data.resultCode === 0) {
+                    Taro.navigateTo({
+                        url: `/pages/registration/registration?info=${JSON.stringify({
+                            name: this.state.name, mobile: this.state.mobile, selector: this.state.selectorChecked, idcard: this.state.idCard
+                        })}&appid=${this.state.appid}&num=3`
+                    })
+                } else {
+                    Taro.showToast({
+                        title: '请求失败',
+                        icon:'none'
+                    })
+                    return
+                }
+                
+        }, (err) => {
+            Taro.showToast({
+                title: '请求失败',
+                icon: 'none'
+            })
+            return})
     }
 }
   render() {

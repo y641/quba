@@ -50,10 +50,14 @@ export default class Mate extends Component {
                     sex: gender,
                     idCode: '01',
                 }, (res) => {
-                    console.log(res, '拆分成员单跳转')
-                    Taro.navigateTo({
-                        url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                    })
+                        if (res.data && res.data.resultCode === 0) {
+                            Taro.navigateTo({
+                                url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                            })
+                        } else {
+                            Taro.showToast({title:'请求失败',icon:'none'})
+                        }
+                   
                 })
             } else {
                 Taro.navigateTo({
@@ -87,12 +91,15 @@ export default class Mate extends Component {
                     sex: gender,
                     idCode: '01',
                 }, (res) => {
-                    Taro.navigateTo({
-                        url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                    })
+                        if (res.data && res.data.resultCode === 0) {
+                            Taro.navigateTo({
+                                url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                            })
+                        } else {
+                            Taro.showToast({ title: '请求失败', icon: 'none' })  
+                   }
                 })
             } else {
-                console.log('不是预订单')
                 Taro.navigateTo({
                     url: `/pages/registration/registration?info=${JSON.stringify(this.state.info)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
                 })

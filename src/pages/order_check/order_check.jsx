@@ -1,6 +1,6 @@
 import Taro, { Component, initPxTransform } from '@tarojs/taro'
 import { View, Text, } from '@tarojs/components'
-import { AtSteps, AtCard, AtButton, AtIcon, AtRadio, AtAccordion, AtList, AtListItem } from 'taro-ui'
+import { AtSteps, AtCard, AtButton} from 'taro-ui'
 import './order_check.scss'
 import { SplitMember } from '../utils/utils'
 
@@ -11,7 +11,6 @@ export default class Index extends Component {
     state = {
         current: 0,
         icon: '#ff0',
-        // checkcircle: '#6190E8',
         checkcircle: '#f0f',
         iconcheck: true,
         getinfo: null, //订单信息
@@ -27,10 +26,8 @@ export default class Index extends Component {
         resultInfo: null
     }
     componentWillMount() {
-        console.log(this.$router.params, 'hahahah')
         let list = [...JSON.parse(this.$router.params.info)]
-        console.log(list, 'list')
-        this.setState({ order: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, idcard: this.$router.params.idcard, sex: this.$router.params.sex }, () => { console.log(this.state.sex) })
+        this.setState({ order: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, idcard: this.$router.params.idcard, sex: this.$router.params.sex })
     }
     choose = () => {
         if (this.state.currentIndex >= 0) {
@@ -48,8 +45,7 @@ export default class Index extends Component {
     textContent = (item, index) => {
         this.setState({ item, currentIndex: index })
     }
-    haha = () => {
-        console.log(this.state.item, 'haha')
+    handle = () => {
         if (this.state.currentIndex >= 0) {
             if (this.state.item.rsvSrcId) {
                 let gender = ''
@@ -63,9 +59,13 @@ export default class Index extends Component {
                     sex: gender,
                     idCode: '01'
                 }, (res) => {
-                    Taro.navigateTo({
-                        url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                    })
+                        if (res.data && res.data.resultCode === 0) {
+                            Taro.navigateTo({
+                                url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1&sex=${this.state.sex}`
+                            })
+                        } else {
+                            Taro.showToast({title:'请求失败',icon:'none'})
+                    }
                 })
             } else {
                 Taro.navigateTo({
@@ -118,7 +118,7 @@ export default class Index extends Component {
                     )
                 }) : null}
                 {this.state.order.length === 1 ? <View className='at-article'>
-                    <AtButton type='primary' onClick={this.haha}>哈哈</AtButton>
+                    <AtButton type='primary' onClick={this.handle}>确认选择</AtButton>
                 </View> : <View className='at-article'>
                         <AtButton type='primary' onClick={this.choose}>确认选择</AtButton>
                     </View>}
