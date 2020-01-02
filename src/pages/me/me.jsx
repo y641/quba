@@ -12,6 +12,7 @@ import {
     findsubscribephone
 } from '../utils/utils'
 import './me.scss'
+import {get,order} from '../utils/AppData'
 
 export default class Me extends Component {
     config = {
@@ -19,49 +20,12 @@ export default class Me extends Component {
     }
     state = {
         getinfo: null,
-        status: 0,
         orderinfo: null
     }
     componentWillMount() {
-        this.getCode()
+        this.setState({ getinfo: get.getInfo })
+        this.inquiryMembe(get.getInfo.certNo)
     }
-    getCode = () => {
-        my.getAuthCode({
-            scopes: 'auth_user',
-            success: (res) => {
-                this.mebme(res.authCode)
-            }
-        });
-    }
-    mebme = (code) => {
-        info({ authCode: code },
-            (res) => {
-                if (res.data && res.data.resultCode === 0) {
-                    this.getinfo(res.data.resultInfo.accessToken)
-                    this.setState({ appid: res.data.resultInfo.buyerId })
-                }
-            })
-    }
-
-    //获取用户信息
-
-    getinfo = (token) => {
-        getuserinfo(
-            { accessToken: token },
-            (res) => {
-                if (res.data && res.data.resultCode === 0) {
-                    this.setState({ getinfo: res.data.resultInfo })
-                    this.inquiryMembe(res.data.resultInfo.certNo)
-                } else {
-                    Taro.showToast({
-                        title: '获取信息失败',
-                        icon: 'none'
-                    })
-                }
-            }
-        )
-    }
-
     //身份证号查询成员单
     inquiryMembe = (certNo) => {
         inquiry({ idCode: '01', idNo: certNo }, (res) => {
@@ -153,10 +117,11 @@ export default class Me extends Component {
         const items = [
             { 'title': '信息录入' },
             { 'title': '押金支付' },
-            { 'title': '办理入住' },
             { 'title': '已入住' },
             { 'title': '已退房' },
         ]
+        const { getinfo } = this.state
+        console.log(this.state.orderinfo)
         return (
             <View>
                 <View className='at-row at-row__align--center' style='background:#fff;margin-top:10px'>
@@ -171,8 +136,8 @@ export default class Me extends Component {
                 <View style='background:#fff;margin-top:10px;padding:10px 0'>
                     <AtSteps
                         items={items}
-                        current={this.state.status}
-                        onChange={() => { }}
+                        current={ this.state.orderinfo && this.state.orderinfo[0].sta === 'I' ? 2 : 0}
+                        onChange={this.doChange}
                     />
                 </View>
                 {this.state.orderinfo ? this.state.orderinfo.map((item, index) => {
@@ -192,16 +157,15 @@ export default class Me extends Component {
                                 <View className='at-article'>
                                     <Text className='at-article__p'>{item.name || item.rsvMan}</Text>
                                     <Text style='border:1px solid #eee;height:10px;width:2px'></Text>
-                                    <Text className='at-article__p'>{this.state.getinfo.mobile}</Text>
+                                    <Text className='at-article__p'>{getinfo.mobile}</Text>
                                 </View>
-                                <View className='at-article__p' >身份信息：{this.state.getinfo.certNo}</View>
+                                <View className='at-article__p' >身份信息：{getinfo.certNo}</View>
                                 <View className='at-article__p'>入住日期：{item.arr}</View>
                                 <View className='at-article__p'>离店日期：{item.dep}</View>
                                 <View className='at-article__p' >入住房型：{item.rmtype}</View>
                                 <View className='at-article__p'>房号：<Text className='at-article__p' style='color:bule'>{item.ratecode}</Text></View>
                             </View>
                         </View>
-                    
                 }) : null}
             </View>
         )

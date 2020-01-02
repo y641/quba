@@ -1,10 +1,10 @@
-import Taro, { Component, initPxTransform } from '@tarojs/taro'
+import Taro, { Component } from '@tarojs/taro'
 import { View, Text, } from '@tarojs/components'
 import { AtSteps, AtCard, AtButton} from 'taro-ui'
 import './order_check.scss'
 import { SplitMember } from '../utils/utils'
 
-export default class Index extends Component {
+export default class Order extends Component {
     config = {
         navigationBarTitleText: '订单核对',
     }
@@ -38,9 +38,6 @@ export default class Index extends Component {
                 icon: 'none'
             })
         }
-    }
-    getContainer = () => {
-
     }
     textContent = (item, index) => {
         this.setState({ item, currentIndex: index })

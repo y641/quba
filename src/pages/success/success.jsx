@@ -3,6 +3,7 @@ import { View,Text  } from '@tarojs/components'
 import { AtSteps, AtCard, AtButton } from 'taro-ui'
 import './success.scss'
 import { shotgunhouse, checkperson} from '../utils/utils'
+import { order } from '../utils/AppData'
 
 export default class success extends Component {
 
@@ -10,12 +11,13 @@ export default class success extends Component {
     navigationBarTitleText: '登记确认'
   }
   state = {
-   current: 3,
+   current: 2,
     getinfo: null,
       money: null,
       rmno:''
   }
     componentWillMount() {
+        order.status=2
    let info = JSON.parse(this.$router.params.info)
         this.setState({ getinfo: info, rmno: this.$router.params.rmno})
     }
@@ -43,6 +45,7 @@ export default class success extends Component {
     //成员单登记入住
     checkin = () => {
         checkperson({ masterId: this.state.getinfo[0].id }, (res) => {
+            console.log(res,'入住')
             if (res.data && res.data.resultCode === 0) {
                 console.log('入住成功')
             } else {
@@ -85,7 +88,7 @@ export default class success extends Component {
           </View>
         })}
         <AtButton type='primary' style='margin:30px 15px 0 15px' onClick={() => {
-          Taro.redirectTo({url:'/pages/index/index'})
+          Taro.navigateBack({delta:100})
         }}>返回首页</AtButton>
       </View>
     )

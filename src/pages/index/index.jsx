@@ -1,6 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Swiper, SwiperItem, Image } from '@tarojs/components'
 import { AtList, AtListItem, AtCard, AtDivider } from 'taro-ui'
+import {get} from '../utils/AppData'
 import './index.scss'
 import {
     info,
@@ -22,18 +23,29 @@ export default class Index extends Component {
         appid: null,
         getinfo: null,  //用户信息
     }
+    componentWillMount() {
+        this.getCode()
+    }
     getCode = () => {
         my.getAuthCode({
             scopes: 'auth_user',
             success: (res) => {
                 this.mebme(res.authCode)
+            },
+            fail: () => {
+                my.alert({
+                    content: '请先进行授权',
+                    success: () => {
+                        this.getCode()
+                    }
+                })
+            
             }
         });
     }
     mebme = (code) => {
         info({ authCode: code },
             (res) => {
-                console.log('授权', res)
                 if (res.data && res.data.resultCode === 0) {
                     this.getinfo(res.data.resultInfo.accessToken)
                     this.setState({ appid: res.data.resultInfo.buyerId })
@@ -48,21 +60,21 @@ export default class Index extends Component {
             { accessToken: token },
             (res) => {
                 if (res.data && res.data.resultCode === 0) {
-                    this.setState({ getinfo: res.data.resultInfo })
-                    this.inquiryMembe(res.data.resultInfo.certNo)
+                    get.getInfo = res.data.resultInfo
+                    this.setState({ getinfo: res.data.resultInfo})
                 } else {
                     Taro.showToast({
                         title: '获取信息失败',
                         icon: 'none'
                     })
                 }
-            }
+            }, 
         )
 }
 
  //身份证号查询成员单
-    inquiryMembe = (certNo) => {
-        inquiry({ idCode: '01', idNo: certNo }, (res) => {
+    inquiryMembe = () => {
+        inquiry({ idCode: '01', idNo: this.state.getinfo.certNo }, (res) => {
             if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length === 0) {
                     //按照姓名查询成员单
                     this.inquiryName()
@@ -145,7 +157,7 @@ export default class Index extends Component {
         Taro.showLoading({
             title: '匹配中'
         })
-        this.getCode()
+        this.inquiryMembe()
     }
     render() {
         return (

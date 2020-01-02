@@ -2,10 +2,11 @@ import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtSteps, AtCard } from 'taro-ui'
 import './registration.scss'
+import {order} from '../utils/AppData'
 import { getmoney, searchroom, getorderstr, gettardeno} from '../utils/utils'
 
 var list = [];
-export default class Index extends Component {
+export default class Registration extends Component {
     config = {
         navigationBarTitleText: '登记确认',
         'usingComponents': {
@@ -48,6 +49,7 @@ export default class Index extends Component {
             dep: this.state.getinfo[0].dep
         }, (res) => {
                 if (res.data && res.data.resultInfo.length > 0) {
+
                     Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}&rmno=${res.data.resultInfo[0].rmno}` })
                 } else if (res.data.resultInfo.length === 0) {
                     Taro.navigateTo({url:'/pages/without/without'})
@@ -61,8 +63,8 @@ export default class Index extends Component {
         my.tradePay({
             tradeNO: trade,
             success: (res) => {
-                console.log(res, '唤起收银台')
                 if (res.result && res.memo === "") {
+                    order.status = 1
                     this.list()
                 }
             },
@@ -83,6 +85,7 @@ export default class Index extends Component {
             orderStr:order,
             success: (res) => {
                 if (res.result && res.memo === "") {
+                    order.status = 1
                    this.list()
                 }
             },
@@ -150,8 +153,8 @@ export default class Index extends Component {
                             <Text >绿云大酒店</Text>
                         </View>
                         <View className='at-article '>
-                            <View className='at-article '>入住：{this.state.getinfo[0].arr}</View>
-                            <View className='at-article '>离店：{this.state.getinfo[0].dep}
+                            <View className='at-article '>入住：{this.state.getinfo && this.state.getinfo[0].arr}</View>
+                            <View className='at-article '>离店：{this.state.getinfo && this.state.getinfo[0].dep}
                                 {/* <Text className='at-article disth'>共{this.stata.rmnum}晚</Text> */}
                             </View>
                         </View>

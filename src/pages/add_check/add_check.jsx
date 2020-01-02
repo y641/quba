@@ -5,7 +5,7 @@ import { addperson} from '../utils/utils'
 import './add_check.scss'
 
 var info = []
-export default class Index extends Component {
+export default class Addcheck extends Component {
   config = {
     navigationBarTitleText: '添加同住',
   }
@@ -46,20 +46,23 @@ export default class Index extends Component {
       },
     });
   }
-  choose = () => {
+    choose = () => {
     if (this.state.name === '') {
       Taro.showToast({ title: '姓名不能为空', icon: 'none' }
       )
       return
     } else if (this.state.mobile === "") {
-      Taro.showToast({ title: '手机号不能为空', icon: 'none' }
-      )
+        Taro.showToast({ title: '手机号不能为空', icon: 'none' })
       return
+    } else if (this.state.mobile.length !== 11) {
+        Taro.showToast({ title: '手机号格式不正确', icon: 'none' })
+        return
+        
     } else if (this.state.idCard === "") {
       Taro.showToast({ title: '身份证号不能为空', icon: 'none' }
       )
       return
-    } else {
+    }  else {
         addperson({
             name: this.state.name,
             sex: '女',
