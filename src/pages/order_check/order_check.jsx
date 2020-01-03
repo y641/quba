@@ -58,7 +58,7 @@ export default class Order extends Component {
                 }, (res) => {
                         if (res.data && res.data.resultCode === 0) {
                             Taro.navigateTo({
-                                url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1&sex=${this.state.sex}`
+                                url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
                             })
                         } else {
                             Taro.showToast({title:'请求失败',icon:'none'})

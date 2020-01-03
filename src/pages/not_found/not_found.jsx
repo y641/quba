@@ -4,7 +4,7 @@ import { AtButton } from 'taro-ui'
 
 export default class NotFound extends Component {
     config = {
-        navigationBarTitleText: '信息匹配',
+        navigationBarTitleText: '绿云大酒店',
     }
     render() {
         return (

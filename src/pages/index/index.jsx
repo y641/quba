@@ -154,10 +154,15 @@ export default class Index extends Component {
         }, () => { Taro.showToast({ title: '请求失败', icon: 'none' }) })
     }
     doClick = () => {
-        Taro.showLoading({
-            title: '匹配中'
-        })
-        this.inquiryMembe()
+        if (this.state.getinfo) {
+            Taro.showLoading({
+                title: '匹配中'
+            })
+            this.inquiryMembe() 
+        } else {
+            console.log('等待')
+        } 
+        
     }
     render() {
         return (

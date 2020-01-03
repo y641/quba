@@ -23,8 +23,12 @@ export default class Me extends Component {
         orderinfo: null
     }
     componentWillMount() {
-        this.setState({ getinfo: get.getInfo })
-        this.inquiryMembe(get.getInfo.certNo)
+        if (get.getInfo) {
+            this.setState({ getinfo: get.getInfo })
+            this.inquiryMembe(get.getInfo.certNo)
+        } else {
+            console.log('等待中')
+        }
     }
     //身份证号查询成员单
     inquiryMembe = (certNo) => {
@@ -106,10 +110,11 @@ export default class Me extends Component {
     retreatRoom = () => {
         Taro.showModal({
             title: '预约退房',
+            cancelText:'取消'
         })
             .then(res => {
                 if (res.confirm) {
-                    
+                   Taro.navigateTo({url:'/pages/checkout/checkout'}) 
                 }
             })
     }

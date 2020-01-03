@@ -6,6 +6,7 @@ import {order} from '../utils/AppData'
 import { getmoney, searchroom, getorderstr, gettardeno} from '../utils/utils'
 
 var list = [];
+var newid=[]
 export default class Registration extends Component {
     config = {
         navigationBarTitleText: '登记确认',
@@ -23,12 +24,17 @@ export default class Registration extends Component {
         room: '',  //房间码
         username: '',  //真实姓名
         rmnum: '',
-        sex:''
+        sex: '',
+        newid:null
     }
     componentWillMount() {
         console.log(this.$router.params,'B')
         if (this.$router.params.num === '1') { list = [JSON.parse(this.$router.params.info)] }
-        else { list = [...list, JSON.parse(this.$router.params.info)]}
+        else {
+            list = [...list, JSON.parse(this.$router.params.info)]
+            newid = [...newid,this.$router.params.newid]
+            this.setState({newid})
+        }
         this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, rmnum: this.$router.params.rmnum ,sex:this.$router.params.sex})
         this.getPayMoney(list[0].id)
     }
@@ -50,7 +56,7 @@ export default class Registration extends Component {
         }, (res) => {
                 if (res.data && res.data.resultInfo.length > 0) {
 
-                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}&rmno=${res.data.resultInfo[0].rmno}` })
+                    Taro.navigateTo({ url: `/pages/success/success?info=${JSON.stringify(this.state.getinfo)}&rmno=${res.data.resultInfo[0].rmno}&newid=${JSON.stringify(this.state.newid)}` })
                 } else if (res.data.resultInfo.length === 0) {
                     Taro.navigateTo({url:'/pages/without/without'})
                 } else {

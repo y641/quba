@@ -13,11 +13,14 @@ export default class success extends Component {
   state = {
    current: 2,
     getinfo: null,
-      money: null,
-      rmno:''
+    money: null,
+      rmno: '',
+    newid:null
   }
     componentWillMount() {
-        order.status=2
+        if (this.$router.params.newid) {
+            this.setState({ newid: JSON.parse(this.$router.params.newid)})
+        }
    let info = JSON.parse(this.$router.params.info)
         this.setState({ getinfo: info, rmno: this.$router.params.rmno})
     }
@@ -30,6 +33,7 @@ export default class success extends Component {
             masterId: this.state.getinfo[0].id,
             rmno: this.state.rmno
         }, (res) => {
+                console.log(res,'排房')
                 if (res.data && res.data.resultCode === 0) {
                     this.checkin()
                 } else {
@@ -44,10 +48,14 @@ export default class success extends Component {
     }
     //成员单登记入住
     checkin = () => {
-        checkperson({ masterId: this.state.getinfo[0].id }, (res) => {
+        var id = [this.state.getinfo[0].id,]
+        if (this.state.newid && this.state.newid.length > 0) {
+            id.push(...this.state.newid)
+        }
+        checkperson({ masterId:id  }, (res) => {
             console.log(res,'入住')
             if (res.data && res.data.resultCode === 0) {
-                console.log('入住成功')
+                order.status = 2
             } else {
                 Taro.showToast({
                     title: '入住失败，请联系酒店前台',
