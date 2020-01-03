@@ -1,12 +1,12 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
-import { AtSteps, AtCard } from 'taro-ui'
+import { AtSteps, AtCard, AtSwipeAction, AtButton, AtDivider  } from 'taro-ui'
 import './registration.scss'
 import {order} from '../utils/AppData'
 import { getmoney, searchroom, getorderstr, gettardeno} from '../utils/utils'
 
 var list = [];
-var newid=[]
+var newid = []
 export default class Registration extends Component {
     config = {
         navigationBarTitleText: '登记确认',
@@ -148,12 +148,10 @@ export default class Registration extends Component {
         return (
             <View>
                 <View className='registration'>
-                    {/* 步骤条 */}
                     <AtSteps
                         items={items}
                         current={this.state.current}
                     />
-                    {/* 登记确认 */}
                     <AtCard>
                         <View className='at-article '>
                             <Text >绿云大酒店</Text>
@@ -161,32 +159,47 @@ export default class Registration extends Component {
                         <View className='at-article '>
                             <View className='at-article '>入住：{this.state.getinfo && this.state.getinfo[0].arr}</View>
                             <View className='at-article '>离店：{this.state.getinfo && this.state.getinfo[0].dep}
-                                {/* <Text className='at-article disth'>共{this.stata.rmnum}晚</Text> */}
                             </View>
                         </View>
                     </AtCard>
-                    <View className='at-article'>
-                        <Text className='at-article__h3 at-article'>入住人</Text>
-                        <Text className='person at-article ' onClick={this.test}>添加同住人</Text>
-                    </View>
-                    <View className='line'></View>
-                    {/* 同住人信息 */}
-                    {this.state.getinfo && this.state.getinfo.map((item, index) => {
-                        return <View>
-                            <View className='at-article__p'>{index===0 ? '入住人' : '同住人'}：{item.name}</View>
-                            <View className='at-article__p'>手机号：{(item.mobile || this.state.mobile) ? (item.mobile || this.state.mobile) : null}</View>
-                            <View className='at-article__p'>身份证：{item.idNo || item.idcard}</View>
-                            <View className='line'></View>
+                    <View className='at-row at-row__justify--between' style='margin:15px 0'>
+                        <View className='at-col at-col-5' style='padding:8px 0 0 15px;font-size:0.35rem'>入住人</View>
+                        <View className='at-col at-col-5' onClick={this.test}>
+                            <AtButton type='primary' size='small'>添加同住人</AtButton>
                         </View>
-                    })}
-                    {/* 费用明细 */}
-                    <View style="margin:30px 10px 0 10px;">
+                    </View>
+                    <AtDivider lineColor='#ddd' />
+                    {this.state.getinfo ? this.state.getinfo.map((item, index) => {
+                        return <View className='normal' style='padding-top:10px'>
+                            <AtSwipeAction  onClick={(value) => {
+                                console.log(value,'点击')
+                            }} options={[
+                                    {
+                                        text: '取消',
+                                        style: {
+                                            backgroundColor: '#6190E8'
+                                        }
+                                    },
+                                    {
+                                        text: '确认',
+                                        style: {
+                                            backgroundColor: '#FF4949'
+                                        }
+                                    }
+                                ]}>
+                                    <View style='padding:8px 0 3px 10px'>{index === 0 ? '入住人' : '同住人'}：{item.name}</View>
+                                <View style='padding:8px 0 3px 10px'>手机号：{(item.mobile || this.state.mobile) ? (item.mobile || this.state.mobile) : null}</View>
+                                <View style='padding:8px 0 3px 10px'>身份证：{item.idNo || item.idcard}</View>
+                                </AtSwipeAction>
+                            </View>
+                    }):null}
+                    {/* <View style="margin:30px 10px 0 10px;">
                         <unify-pay
                             userId={this.state.appid}
                             serviceId='2019122400000000000003655000'
                             onClick={this.getOrder.bind(this)}
                         />
-                    </View>
+                    </View> */}
                 </View>
             </View>
         )

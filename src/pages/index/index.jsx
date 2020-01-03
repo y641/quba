@@ -14,6 +14,8 @@ import {
     findsubscribephone
 } from '../utils/utils'
 
+
+
 export default class Index extends Component {
     config = {
         navigationBarTitleText: '绿云大酒店',
@@ -30,6 +32,7 @@ export default class Index extends Component {
         my.getAuthCode({
             scopes: 'auth_user',
             success: (res) => {
+                Taro.showLoading({title:'获取信息中...'})
                 this.mebme(res.authCode)
             },
             fail: () => {
@@ -60,8 +63,10 @@ export default class Index extends Component {
             { accessToken: token },
             (res) => {
                 if (res.data && res.data.resultCode === 0) {
+                    Taro.hideLoading()
                     get.getInfo = res.data.resultInfo
-                    this.setState({ getinfo: res.data.resultInfo})
+                    this.setState({ getinfo: res.data.resultInfo })
+                    
                 } else {
                     Taro.showToast({
                         title: '获取信息失败',
@@ -98,7 +103,6 @@ export default class Index extends Component {
     }
 //手机号查询成员单
     inquiryPhone = () => {
-        console.log(this.state.getinfo.mobile)
         findphone({ mobile: this.state.getinfo.mobile }, (res) => {
             if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length === 0) {
                     this.inquiryPredetermined()
@@ -154,14 +158,10 @@ export default class Index extends Component {
         }, () => { Taro.showToast({ title: '请求失败', icon: 'none' }) })
     }
     doClick = () => {
-        if (this.state.getinfo) {
-            Taro.showLoading({
-                title: '匹配中'
-            })
-            this.inquiryMembe() 
-        } else {
-            console.log('等待')
-        } 
+        Taro.showLoading({
+            title: '匹配中'
+        })
+        this.inquiryMembe() 
         
     }
     render() {

@@ -1,6 +1,5 @@
 import Taro, { Component } from '@tarojs/taro'
-import { View, Text } from '@tarojs/components'
-import { AtButton } from 'taro-ui'
+import { View, Text, Image } from '@tarojs/components'
 
 export default class NotFound extends Component {
     config = {
@@ -8,24 +7,12 @@ export default class NotFound extends Component {
     }
     render() {
         return (
-            <View>
-                <View className='at-row' style='margin-top:25px'>
-                    <View className='at-col at-col__offset-4'>
-                        <icon type='warn' size='140'></icon>
+            <View style='padding-top:50px'>
+                <View>
+                    <View>
+                        <Image style='height:80px;width:80px;' src={require('../../img/face.png')}></Image>
                     </View>
-                </View>
-                <View className='at-row'>
-                    <View className='at-col at-col__offset-3'>
-                        <Text className='at-article__h2'>抱歉~~订单未找到！</Text>
-                    </View>
-                </View>
-                <View className='at-row'>
-                    <View className='at-col at-col__offset-3'>
-                        <Text className='at-article__p'>请确认信息匹配正确</Text>
-                    </View>
-                </View>
-                <View style='margin:50px 100px'>
-                <AtButton type='secondary'>返回并继续</AtButton>
+                    <View>呃~~没有查询到和您相关的订单，您可以尝试以下操作</View>
                 </View>
             </View>
         )

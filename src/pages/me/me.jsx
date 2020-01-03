@@ -2,8 +2,6 @@ import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtSteps, AtButton, AtDivider } from 'taro-ui'
 import {
-    info,
-    getuserinfo,
     inquiry,
     findname,
     findphone,
@@ -56,7 +54,6 @@ export default class Me extends Component {
     }
     //手机号查询成员单
     inquiryPhone = () => {
-        console.log(this.state.getinfo.mobile)
         findphone({ mobile: this.state.getinfo.mobile }, (res) => {
             if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length === 0) {
                 this.inquiryPredetermined()
@@ -126,7 +123,6 @@ export default class Me extends Component {
             { 'title': '已退房' },
         ]
         const { getinfo } = this.state
-        console.log(this.state.orderinfo)
         return (
             <View>
                 <View className='at-row at-row__align--center' style='background:#fff;margin-top:10px'>

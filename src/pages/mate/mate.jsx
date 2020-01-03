@@ -2,13 +2,14 @@ import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtSegmentedControl, AtButton, AtInput, AtForm } from 'taro-ui'
 import { SplitMember } from '../utils/utils'
+import './mate.scss'
 
 export default class Mate extends Component {
     config = {
         navigationBarTitleText: '信息匹配',
     }
     state = {
-        cuurent: 0,
+        status: 0,
         mate: '',
         phone: '',
         info: null,
@@ -18,12 +19,12 @@ export default class Mate extends Component {
     }
     componentWillMount() {
         let info = JSON.parse(this.$router.params.info)
-        console.log(info)
-        this.setState({appid:this.$router.params.appid, info, idcard: this.$router.params.idcard, sex: this.$router.params.sex })
+        console.log(info,'info')
+        this.setState({ appid: this.$router.params.appid, info, idcard: this.$router.params.idcard, sex: this.$router.params.sex })
     }
     handleClick = (value) => {
         this.setState({
-            current: value
+            status: value
         })
     }
     handleChange = (value) => {
@@ -114,15 +115,14 @@ export default class Mate extends Component {
     render() {
         return (
             <View style='padding-top:20px'>
-                <View>
                     <AtSegmentedControl
                         values={['预订单号', '手机号码']}
                         onClick={this.handleClick}
-                        current={this.state.current}
-                    />
+                        current={this.state.status}
+                />
                     {
-                        this.state.current === 0 
-                            ? <View className='tab-content'>
+                        this.state.status === 0 
+                        ? <View className='tab-content'>
                                 <AtForm>
                                     <AtInput
                                         style='height:300px'
@@ -137,7 +137,7 @@ export default class Mate extends Component {
                             : null
                     }
                     {
-                        this.state.current === 1
+                    this.state.status === 1
                             ? <View className='tab-content'>
                                 <AtForm>
                                     <AtInput
@@ -152,10 +152,9 @@ export default class Mate extends Component {
                             </View>
                             : null
                     }
-                </View>
-                {this.state.current === 0 ? <View style='margin:100px 20px 0 20px'>
+                {this.state.status === 0 ? <View style='margin:80px 20px 0 20px'>
                     <AtButton type='primary' onClick={this.doClick}>确认匹配</AtButton>
-                </View> : <View style='margin:100px 20px 0 20px'>
+                </View> : <View style='margin:80px 20px 0 20px'>
                         <AtButton type='primary' onClick={this.handle}>确认匹配</AtButton>
                     </View>}
             </View>
