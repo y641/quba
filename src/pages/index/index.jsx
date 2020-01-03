@@ -153,7 +153,7 @@ export default class Index extends Component {
                 Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
             } else if (res.data && res.data.resultInfo.length === 0) {
                 Taro.hideLoading()
-               my.alert({content:'没有查询到订单'})
+                Taro.navigateTo({url:'/pages/not_found/not_found'})
             }
         }, () => { Taro.showToast({ title: '请求失败', icon: 'none' }) })
     }
