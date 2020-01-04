@@ -116,6 +116,7 @@ export default class Addcheck extends Component {
             sex: gender,
             idCode: '01',
             idNo: this.state.idCard,
+            mobile:this.state.mobile,
             masterId: this.state.getinfo.id
         }, (res) => {
                 console.log(res)

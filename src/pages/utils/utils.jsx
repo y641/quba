@@ -272,7 +272,8 @@ export function addperson(params, success, fail) {
             name: params.name,
             sex:params.sex,
             idCode: params.idCode,
-            idNo:params.idNo,
+            idNo: params.idNo,
+            mobile:params.mobile,
             masterId:params.masterId
         },
         success: res => {

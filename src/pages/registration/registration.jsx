@@ -25,12 +25,12 @@ export default class Registration extends Component {
         username: '',  //真实姓名
         rmnum: '',
         sex: '',
-        newid:null
+        newid: null,
+        isOpened:false
     }
     componentWillMount() {
-        console.log(this.$router.params,'B')
         if (this.$router.params.num === '1') { list = [JSON.parse(this.$router.params.info)] }
-        else {
+        else if(this.$router.params.num==='3'){
             list = [...list, JSON.parse(this.$router.params.info)]
             newid = [...newid,this.$router.params.newid]
             this.setState({newid})
@@ -139,6 +139,24 @@ export default class Registration extends Component {
                 }
         })  
     }
+    del = (value) => {
+        if (value.text === '删除') {
+            Taro.showModal({
+                title: '确认删除',
+                cancelText:'取消',
+                success: res => {
+                    if (res.confirm) {
+                        Taro.showToast({ title: '删除成功', icon: 'none' })
+                        this.setState({ isOpened: this.state.isOpened })
+                    } else {
+                        this.setState({ isOpened: this.state.isOpened })
+                    }
+                }
+            })
+        } else {
+            this.setState({ isOpened:this.state.isOpened}) 
+        }
+    }
     render() {
         const items = [
             { 'title': '房间选择' },
@@ -170,10 +188,8 @@ export default class Registration extends Component {
                     </View>
                     <AtDivider lineColor='#ddd' />
                     {this.state.getinfo ? this.state.getinfo.map((item, index) => {
-                        return <View className='normal' style='padding-top:10px'>
-                            <AtSwipeAction  onClick={(value) => {
-                                console.log(value,'点击')
-                            }} options={[
+                        return <View key={index} className='normal' style='padding-top:10px'>
+                            <AtSwipeAction isOpened={this.state.isOpened}  onClick={this.del} options={[
                                     {
                                         text: '取消',
                                         style: {
@@ -181,7 +197,7 @@ export default class Registration extends Component {
                                         }
                                     },
                                     {
-                                        text: '确认',
+                                        text: '删除',
                                         style: {
                                             backgroundColor: '#FF4949'
                                         }
@@ -192,14 +208,14 @@ export default class Registration extends Component {
                                 <View style='padding:8px 0 3px 10px'>身份证：{item.idNo || item.idcard}</View>
                                 </AtSwipeAction>
                             </View>
-                    }):null}
-                    {/* <View style="margin:30px 10px 0 10px;">
+                    }) : null}
+                    <View style="margin:20px 10px 0 10px;">
                         <unify-pay
                             userId={this.state.appid}
                             serviceId='2019122400000000000003655000'
                             onClick={this.getOrder.bind(this)}
                         />
-                    </View> */}
+                    </View>
                 </View>
             </View>
         )
