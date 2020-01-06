@@ -176,13 +176,22 @@ export default class Index extends Component {
                     indicatorActiveColor='#bf708f'
                     autoplay>
                     <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/1.jpg')}></Image>
+                        <Image className="swiper-img" mode="widthFix" src={require('../../img/4.jpg')}></Image>
                     </SwiperItem>
                     <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/2.jpg')}></Image>
+                        <Image className="swiper-img" mode="widthFix" src={require('../../img/5.jpg')}></Image>
                     </SwiperItem>
                     <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/3.jpg')}></Image>
+                        <Image className="swiper-img" mode="widthFix" src={require('../../img/6.jpg')}></Image>
+                    </SwiperItem>
+                    <SwiperItem>
+                        <Image className="swiper-img" mode="widthFix" src={require('../../img/7.jpg')}></Image>
+                    </SwiperItem>
+                    <SwiperItem>
+                        <Image className="swiper-img" mode="widthFix" src={require('../../img/8.jpg')}></Image>
+                    </SwiperItem>
+                    <SwiperItem>
+                        <Image className="swiper-img" mode="widthFix" src={require('../../img/9.jpg')}></Image>
                     </SwiperItem>
                 </Swiper>
                 {/* 卡片 */}
