@@ -26,7 +26,8 @@ export default class Registration extends Component {
         rmnum: '',
         sex: '',
         newid: null,
-        isOpened:false
+        isOpened: false,
+        disabled:'disabled'
     }
     componentWillMount() {
         if (this.$router.params.num === '1') { list = [JSON.parse(this.$router.params.info)] }
@@ -195,7 +196,7 @@ export default class Registration extends Component {
                         }
                         
                         return <View key={index} className='normal' style='padding-top:10px'>
-                            <AtSwipeAction isOpened={this.state.isOpened}  onClick={this.del} options={[
+                            <AtSwipeAction isOpened={this.state.isOpened} disabled={index === 0 ? this.state.disabled :null}  onClick={this.del} options={[
                                     {
                                         text: '取消',
                                         style: {
