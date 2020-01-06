@@ -27,8 +27,6 @@ export default class Index extends Component {
     }
     componentWillMount() {
         this.getCode()
-        var card = '341221199207118587';
-        var strcard = card.replace(/^(.{4})(?:\d+)(.{4})$/, "$1******$2");
     }
     getCode = () => {
         my.getAuthCode({
