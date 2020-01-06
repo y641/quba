@@ -2,7 +2,7 @@ import Taro, { Component } from '@tarojs/taro'
 import { View, Text, } from '@tarojs/components'
 import { AtSteps, AtCard, AtButton} from 'taro-ui'
 import './order_check.scss'
-import { SplitMember } from '../utils/utils'
+import { SplitMember,noPassByMobile,noPassByName } from '../utils/utils'
 
 export default class Order extends Component {
     config = {
@@ -77,6 +77,7 @@ export default class Order extends Component {
         }
     }
     render() {
+       
         const items = [
             { 'title': '房间选择' },
             { 'title': '登记确认' },
@@ -93,6 +94,8 @@ export default class Order extends Component {
                 />
                 {/* 预定信息 */}
                 {this.state.order ? this.state.order.map((item, index) => {
+                    
+
                     return (
                         <View className='post'>
                             <AtCard
@@ -100,13 +103,13 @@ export default class Order extends Component {
                                 onClick={this.textContent.bind(this, item, index)}
                             >
                                 <View>
-                                    <Text className='at-article'>预定人：{item.rsvMan}</Text>
+                                    <Text className='at-article'>预定人：{noPassByName(item.rsvMan)}</Text>
                                     <Text className='at-article ditch'>预定渠道：飞猪</Text>
                                 </View>
                                 <View>
                                     <icon type="success" size='30' className='icon' color={index === this.state.currentIndex ? '#6190E8' : '#ddd'} />
                                 </View>
-                                <View className='at-article'>联系电话：{item.mobile || mobile}</View>
+                                <View className='at-article'>联系电话：{noPassByMobile(item.mobile)}</View>
                                 <View className='at-article'>入住日期：{item.arr}</View>
                                 <View className='at-article'>离店日期：{item.dep}</View>
                                 <View className='at-article'>入住房型：{item.rmtype}</View>

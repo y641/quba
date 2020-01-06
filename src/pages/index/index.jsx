@@ -1,8 +1,9 @@
-import Taro, { Component } from '@tarojs/taro'
+﻿import Taro, { Component } from '@tarojs/taro'
 import { View, Swiper, SwiperItem, Image } from '@tarojs/components'
 import { AtList, AtListItem, AtCard, AtDivider } from 'taro-ui'
 import {get} from '../utils/AppData'
 import './index.scss'
+
 import {
     info,
     getuserinfo,
@@ -13,7 +14,6 @@ import {
     findsubscribename,
     findsubscribephone
 } from '../utils/utils'
-
 
 
 export default class Index extends Component {
@@ -27,6 +27,8 @@ export default class Index extends Component {
     }
     componentWillMount() {
         this.getCode()
+        var card = '341221199207118587';
+        var strcard = card.replace(/^(.{4})(?:\d+)(.{4})$/, "$1******$2");
     }
     getCode = () => {
         my.getAuthCode({

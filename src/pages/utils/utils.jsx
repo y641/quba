@@ -390,3 +390,27 @@ export function checkperson(params, success, fail) {
 }
 
 
+//手机号脱敏
+export function noPassByMobile(str) {
+    if (null != str && str != undefined) {
+        var pat = /(\d{3})\d*(\d{2})/;
+        return str.replace(pat, '$1******$2');
+    } else {
+        return "";
+    }
+}
+
+//姓名脱敏
+export function noPassByName(str) {
+    if (null != str && str != undefined) {
+        if (str.length <= 3) {
+            return "*" + str.substring(1, str.length);
+        } else if (str.length > 3 && str.length <= 6) {
+            return "**" + str.substring(2, str.length);
+        } else if (str.length > 6) {
+            return str.substring(0, 2) + "****" + str.substring(6, str.length)
+        }
+    } else {
+        return "";
+    }
+}

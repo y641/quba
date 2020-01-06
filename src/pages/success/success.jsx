@@ -2,7 +2,7 @@ import Taro, { Component} from '@tarojs/taro'
 import { View,Text  } from '@tarojs/components'
 import { AtSteps, AtCard, AtButton } from 'taro-ui'
 import './success.scss'
-import { shotgunhouse, checkperson} from '../utils/utils'
+import { shotgunhouse, checkperson,noPassByMobile,noPassByName} from '../utils/utils'
 import { order } from '../utils/AppData'
 
 export default class success extends Component {
@@ -87,11 +87,16 @@ export default class success extends Component {
         </View>
         <View className='line'></View>
         {/* 入住人信息 */}
-        {this.state.getinfo && this.state.getinfo.map((item,index) => {
+            {this.state.getinfo && this.state.getinfo.map((item, index) => {
+                if (index === 0) {
+                    var idcard = item.idNo.replace(/^(.{4})(?:\d+)(.{4})$/, "$1******$2")   
+                } else {
+                    var card = item.idcard.replace(/^(.{4})(?:\d+)(.{4})$/, "$1******$2")   
+                }
           return <View className='at-article__h1'>
-            <View className='at-article__p'>{item.name}</View>
-            <View className='at-article__p'>手机号：{item.mobile}</View>
-            <View className='at-article__p'>身份证:{index===0 ? item.idNo : item.idcard}</View>
+              <View className='at-article__p'>{noPassByName(item.name)}</View>
+              <View className='at-article__p'>手机号：{noPassByMobile(item.mobile)}</View>
+              <View className='at-article__p'>身份证:{index === 0 ? idcard : card}</View>
             <View className='line'></View>
           </View>
         })}

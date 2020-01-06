@@ -116,12 +116,28 @@ export default class Mate extends Component {
         return (
             <View style='padding-top:20px'>
                     <AtSegmentedControl
-                        values={['预订单号', '手机号码']}
+                    values={['手机号码','预订单号']}
                         onClick={this.handleClick}
                         current={this.state.status}
                 />
+                {
+                    this.state.status === 0
+                        ? <View className='tab-content'>
+                            <AtForm>
+                                <AtInput
+                                    style='height:300px'
+                                    name={this.state.phone}
+                                    type='phone'
+                                    placeholder='预订手机后4位'
+                                    value={this.state.phone}
+                                    onChange={this.doChange}
+                                />
+                            </AtForm>
+                        </View>
+                        : null
+                }
                     {
-                        this.state.status === 0 
+                        this.state.status === 1 
                         ? <View className='tab-content'>
                                 <AtForm>
                                     <AtInput
@@ -136,27 +152,12 @@ export default class Mate extends Component {
                             </View>
                             : null
                     }
-                    {
-                    this.state.status === 1
-                            ? <View className='tab-content'>
-                                <AtForm>
-                                    <AtInput
-                                        style='height:300px'
-                                        name={this.state.phone}
-                                        type='phone'
-                                        placeholder='预订手机后4位'
-                                        value={this.state.phone}
-                                        onChange={this.doChange}
-                                    />
-                                </AtForm>
-                            </View>
-                            : null
-                    }
+                   
                 {this.state.status === 0 ? <View style='margin:80px 20px 0 20px'>
+                    <AtButton type='primary' onClick={this.handle}>确认匹配</AtButton>
+                </View>: <View style='margin:80px 20px 0 20px'>
                     <AtButton type='primary' onClick={this.doClick}>确认匹配</AtButton>
-                </View> : <View style='margin:80px 20px 0 20px'>
-                        <AtButton type='primary' onClick={this.handle}>确认匹配</AtButton>
-                    </View>}
+                </View>}
             </View>
         )
     }

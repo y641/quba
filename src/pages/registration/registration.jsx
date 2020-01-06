@@ -3,7 +3,7 @@ import { View, Text } from '@tarojs/components'
 import { AtSteps, AtCard, AtSwipeAction, AtButton, AtDivider  } from 'taro-ui'
 import './registration.scss'
 import {order} from '../utils/AppData'
-import { getmoney, searchroom, getorderstr, gettardeno} from '../utils/utils'
+import { getmoney, searchroom, getorderstr, gettardeno,noPassByName,noPassByMobile} from '../utils/utils'
 
 var list = [];
 var newid = []
@@ -188,6 +188,12 @@ export default class Registration extends Component {
                     </View>
                     <AtDivider lineColor='#ddd' />
                     {this.state.getinfo ? this.state.getinfo.map((item, index) => {
+                        if (item.idNo) {
+                            var idcard = item.idNo.replace(/^(.{4})(?:\d+)(.{4})$/, "$1******$2")
+                        } else {
+                            var card = item.idcard.replace(/^(.{4})(?:\d+)(.{4})$/, "$1******$2")
+                        }
+                        
                         return <View key={index} className='normal' style='padding-top:10px'>
                             <AtSwipeAction isOpened={this.state.isOpened}  onClick={this.del} options={[
                                     {
@@ -203,9 +209,9 @@ export default class Registration extends Component {
                                         }
                                     }
                                 ]}>
-                                    <View style='padding:8px 0 3px 10px'>{index === 0 ? '入住人' : '同住人'}：{item.name}</View>
-                                <View style='padding:8px 0 3px 10px'>手机号：{(item.mobile || this.state.mobile) ? (item.mobile || this.state.mobile) : null}</View>
-                                <View style='padding:8px 0 3px 10px'>身份证：{item.idNo || item.idcard}</View>
+                                <View style='padding:8px 0 3px 10px'>{index === 0 ? '入住人' : '同住人'}：{noPassByName(item.name)}</View>
+                                <View style='padding:8px 0 3px 10px'>手机号：{noPassByMobile(item.mobile || this.state.mobile)}</View>
+                                <View style='padding:8px 0 3px 10px'>身份证：{idcard || card}</View>
                                 </AtSwipeAction>
                             </View>
                     }) : null}
