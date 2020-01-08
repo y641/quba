@@ -3,7 +3,6 @@ import { View, Swiper, SwiperItem, Image } from '@tarojs/components'
 import { AtList, AtListItem, AtCard, AtDivider } from 'taro-ui'
 import {get} from '../utils/AppData'
 import './index.scss'
-
 import {
     info,
     getuserinfo,
@@ -56,8 +55,7 @@ export default class Index extends Component {
             })
     }
 
-    //获取用户信息
-
+    // 获取用户信息
     getinfo = (token) => {
         getuserinfo(
             { accessToken: token },
@@ -153,7 +151,7 @@ export default class Index extends Component {
                 Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.sex}` })
             } else if (res.data && res.data.resultInfo.length === 0) {
                 Taro.hideLoading()
-                Taro.navigateTo({url:'/pages/not_found/not_found'})
+                my.alert({content:'没有查询到您的订单'})
             }
         }, () => { Taro.showToast({ title: '请求失败', icon: 'none' }) })
     }
@@ -161,8 +159,7 @@ export default class Index extends Component {
         Taro.showLoading({
             title: '匹配中'
         })
-        this.inquiryMembe() 
-        
+        this.inquiryMembe()  
     }
     render() {
         return (

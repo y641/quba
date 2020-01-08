@@ -8,7 +8,6 @@ class App extends Component {
   config = {
       pages: [
           'pages/index/index',
-          'pages/not_found/not_found',
           'pages/checkout/checkout',
           'pages/mate/mate',
           'pages/without/without',

@@ -128,7 +128,7 @@ export default class Mate extends Component {
                                     style='height:300px'
                                     name={this.state.phone}
                                     type='phone'
-                                    placeholder='预订手机后4位'
+                                    placeholder='请输入预订手机号后4位'
                                     value={this.state.phone}
                                     onChange={this.doChange}
                                 />

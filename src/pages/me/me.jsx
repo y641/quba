@@ -10,7 +10,7 @@ import {
     findsubscribephone
 } from '../utils/utils'
 import './me.scss'
-import {get,order} from '../utils/AppData'
+import {get} from '../utils/AppData'
 
 export default class Me extends Component {
     config = {
