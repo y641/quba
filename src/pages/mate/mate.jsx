@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtSegmentedControl, AtButton, AtInput, AtForm } from 'taro-ui'
-import { SplitMember } from '../utils/utils'
+import { SplitMember, searchroom, shotgunhouse } from '../utils/utils'
 import './mate.scss'
 
 export default class Mate extends Component {
@@ -15,11 +15,12 @@ export default class Mate extends Component {
         info: null,
         idcard: '',
         sex: '',
-        appid:''
+        appid: '',
+        rsvNo:''  //纯预留编号
     }
     componentWillMount() {
         let info = JSON.parse(this.$router.params.info)
-        console.log(info,'info')
+        Taro.setStorage({ key: 'rsvNo', data: info.rsvNo })
         this.setState({ appid: this.$router.params.appid, info, idcard: this.$router.params.idcard, sex: this.$router.params.sex })
     }
     handleClick = (value) => {
@@ -34,7 +35,7 @@ export default class Mate extends Component {
         this.setState({ phone: value })
     }
     doClick = () => {
-        if (this.state.info.rsvNo === this.state.mate) {
+        if (this.state.rsvNo === this.state.mate) {
             let gender = ''
             if (this.state.sex === 'f') {
                 gender = '女'
@@ -52,9 +53,8 @@ export default class Mate extends Component {
                     idCode: '01',
                 }, (res) => {
                         if (res.data && res.data.resultCode === 0) {
-                            Taro.navigateTo({
-                                url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                            })
+                            this.setState({ item: res.data.resultInfo })
+                            this.checkRoom(res.data.resultInfo.rmno, res.data.resultInfo.rmtype, res.data.resultInfo.arr, res.data.resultInfo.dep, res.data.resultInfo.id)
                         } else {
                             Taro.showToast({title:'请求失败',icon:'none'})
                         }
@@ -67,12 +67,52 @@ export default class Mate extends Component {
             }
            
 
-        } else {
+        } else{
             Taro.showToast({
                 title: '预订单号输入错误',
                 icon: 'none'
             })
         }
+    }
+
+    checkRoom = (rmno,roomType, startArr,endDep,id) => {
+        // 查询可用房间
+        if (rmno === '') {
+            searchroom({
+                rmtype: roomType,
+                arr: startArr,
+                dep: endDep
+            }, (res) => {
+                console.log(res, '查询可用房间')
+                if (res.data && res.data.resultInfo.length > 0) { // 有可用房号
+                    Taro.setStorage({ key: 'rmnoCode', data: res.data.resultInfo[0].rmno })
+                    this.assignRoom(res.data.resultInfo[0].rmno, id)
+                } else if (res.data.resultInfo.length === 0) {
+                    Taro.navigateTo({ url: '/pages/without/without' })
+                }
+            })
+        } else {
+            Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1&&rmno=${this.state.rmno}` })
+        }
+    }
+    assignRoom = (rmno, id) => {
+        shotgunhouse({
+            masterId: id,
+            rmno
+        }, (res) => {
+            console.log(res, '排房')
+            if (res.data && res.data.resultCode === 0) { // 排房成功
+                console.log(res, '排房成功')
+                this.setState({ item: { ...this.state.item, rmno: '***' } })
+                Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1&rmno=${rmno}` })
+            } else {
+                Taro.showToast({
+                    title: '排房失败',
+                    icon: 'none'
+                })
+                return
+            }
+        })
     }
     handle = () => {
         let gender = ''
@@ -93,11 +133,13 @@ export default class Mate extends Component {
                     idCode: '01',
                 }, (res) => {
                         if (res.data && res.data.resultCode === 0) {
-                            Taro.navigateTo({
-                                url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                            })
+                            console.log(res, '拆分成员单')
+                            this.setState({item:res.data.resultInfo})
+                            this.checkRoom(res.data.resultInfo.rmno,res.data.resultInfo.rmtype,res.data.resultInfo.arr,res.data.resultInfo.dep,res.data.resultInfo.id)
                         } else {
-                            Taro.showToast({ title: '请求失败', icon: 'none' })  
+                            Taro.navigateTo({
+                                url: `/pages/registration/registration?info=${JSON.stringify(this.state.info)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                            })  
                    }
                 })
             } else {
@@ -113,6 +155,7 @@ export default class Mate extends Component {
         }
     }
     render() {
+        Taro.getStorage({ key: 'rsvNo' }).then(res => this.setState({ rsvNo:res.data}))
         return (
             <View style='padding-top:20px'>
                     <AtSegmentedControl

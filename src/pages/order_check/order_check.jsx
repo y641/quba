@@ -65,8 +65,6 @@ export default class Order extends Component {
                 } 
             })
         } else {
-            // todo
-            console.log('else')
             Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1&&rmno=${this.state.rmno}` })
         }
     }
