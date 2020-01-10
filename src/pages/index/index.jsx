@@ -1,7 +1,5 @@
 ﻿import Taro, { Component } from '@tarojs/taro'
 import { View, Swiper, SwiperItem, Image } from '@tarojs/components'
-import { AtList, AtListItem, AtCard, AtDivider } from 'taro-ui'
-import { get } from '../utils/AppData'
 import './index.scss'
 import {
     info,
@@ -48,6 +46,7 @@ export default class Index extends Component {
         info({ authCode: code },
             (res) => {
                 if (res.data && res.data.resultCode === 0) {
+                    Taro.setStorage({ key: 'buyerId', data: res.data.resultInfo.buyerId})
                     this.getinfo(res.data.resultInfo.accessToken)
                     this.setState({ appid: res.data.resultInfo.buyerId })
                 }
@@ -64,7 +63,6 @@ export default class Index extends Component {
             (res) => {
                 if (res.data && res.data.resultCode === 0) {
                     Taro.hideLoading()
-                    get.getInfo = res.data.resultInfo
                     Taro.setStorage({ key: 'getInfo', data: res.data.resultInfo}).then(res=>{console.log(res)})
                     this.setState({ getinfo: res.data.resultInfo })
 
@@ -85,10 +83,13 @@ export default class Index extends Component {
     //身份证号查询成员单
     inquiryMembe = () => {
         inquiry({ idCode: '01', idNo: this.state.getinfo.certNo }, (res) => {
+            console.log(res,'身份证查询')
             if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length === 0) {
                 //按照姓名查询成员单
                 this.inquiryName()
-            } else {
+            } else if (res.data && res.data.resultInfo.length > 0&& res.data.resultInfo[0].sta==='I') {
+                Taro.navigateTo({ url:`/pages/check_success/check_success?checksuccess=${JSON.stringify(res.data.resultInfo)}`})
+            }else{
                 Taro.hideLoading()
                 Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.gender}` })
             }
@@ -221,14 +222,14 @@ export default class Index extends Component {
                     <View className='at-article__p'
                         style="margin:0;color:#000;font-size:20px;padding-bottom:5px">散客入住</View>
                     <View className='at-article__p' style='margin:0;'>FIT</View>
-                    <Image style='position:absolute;bottom:188px;left:226px;height:60px;width:110px' mode="widthFix" src={require('../../img/img_01.png')}></Image>
+                    <Image style='position:absolute;bottom:188px;left:226px;height:60px;width:100px' mode="widthFix" src={require('../../img/img_01.png')}></Image>
                 </View>
                 {/* 团队入住 */}
                 <View style='height:60px;background:#fff;border:1px solid #eee;border-radius:5px;margin:10px 30px 0 30px;padding:20px 0 10px 20px;position:reletive;'>
                     <View className='at-article__p'
                         style="margin:0;color:#000;font-size:20px;padding-bottom:5px">团队入住</View>
                     <View className='at-article__p' style='margin:0;'>GROUP</View>
-                    <Image style='position:absolute;bottom:87px;left:226px;height:80px;width:110px' mode="widthFix" src={require('../../img/img_02.png')}></Image>
+                    <Image style='position:absolute;bottom:87px;left:226px;height:80px;width:100px' mode="widthFix" src={require('../../img/img_02.png')}></Image>
                 </View>
             </View>
         )

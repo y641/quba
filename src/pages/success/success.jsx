@@ -3,7 +3,7 @@ import { View,Text  } from '@tarojs/components'
 import { AtSteps, AtCard, AtButton } from 'taro-ui'
 import './success.scss'
 import { shotgunhouse, checkperson,noPassByMobile,noPassByName} from '../utils/utils'
-import { order } from '../utils/AppData'
+import { order, getInfo, regtion} from '../utils/AppData'
 
 export default class success extends Component {
 
@@ -18,37 +18,16 @@ export default class success extends Component {
     newid:null
   }
     componentWillMount() {
-        if (this.$router.params.newid) {
-            this.setState({ newid: JSON.parse(this.$router.params.newid)})
+        console.log(getInfo, regtion,'success')
+        if (getInfo.newid) {
+            this.setState({ getinfo: getInfo.list, newid: getInfo.newid }, () => { this.checkin() })
+        } else {
+            this.setState({ getinfo: regtion.regtionOrder }, () => { this.checkin() }) 
         }
-   let info = JSON.parse(this.$router.params.info)
-        this.setState({ getinfo: info, rmno: this.$router.params.rmno})
-    }
-    componentDidMount() {
-        this.check()
-    }
-    //成元单排房
-    check = () => {
-        shotgunhouse({
-            masterId: this.state.getinfo[0].id,
-            rmno: this.state.rmno
-        }, (res) => {
-                console.log(res,'排房')
-                if (res.data && res.data.resultCode === 0) {
-                    this.checkin()
-                } else {
-                    Taro.showToast({
-                        title: '排房失败',
-                        icon:'none'
-                    })
-                    return 
-                }
-                
-        })
     }
     //成员单登记入住
     checkin = () => {
-        var id = [this.state.getinfo[0].id,]
+            var id = [this.state.getinfo[0].id,]
         if (this.state.newid && this.state.newid.length > 0) {
             id.push(...this.state.newid)
         }
@@ -87,7 +66,7 @@ export default class success extends Component {
         </View>
         <View className='line'></View>
         {/* 入住人信息 */}
-            {this.state.getinfo && this.state.getinfo.map((item, index) => {
+            {this.state.getinfo ?this.state.getinfo.map((item, index) => {
                 if (index === 0) {
                     var idcard = item.idNo.replace(/^(.{4})(?:\d+)(.{4})$/, "$1******$2")   
                 } else {
@@ -99,7 +78,7 @@ export default class success extends Component {
               <View className='at-article__p'>身份证:{index === 0 ? idcard : card}</View>
             <View className='line'></View>
           </View>
-        })}
+        }):null}
         <AtButton type='primary' style='margin:30px 15px 0 15px' onClick={() => {
           Taro.navigateBack({delta:100})
         }}>返回首页</AtButton>

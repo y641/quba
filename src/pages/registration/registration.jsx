@@ -2,8 +2,8 @@ import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { AtSteps, AtCard, AtSwipeAction, AtButton, AtDivider, AtIcon, AtFloatLayout  } from 'taro-ui'
 import './registration.scss'
-import { getInfo, regtion,rmnoRoom } from '../utils/AppData'
-import { getmoney, searchroom, getorderstr, gettardeno, noPassByName, noPassByMobile } from '../utils/utils'
+import { getInfo, regtion } from '../utils/AppData'
+import { getmoney, noPassByName, noPassByMobile } from '../utils/utils'
 
 var list = [];
 var newid = []
@@ -71,11 +71,13 @@ export default class Registration extends Component {
         rmnoCode:''  //房间号
     }
     componentWillMount() {
+         Taro.getStorage({key:'rmnoCode'}).then(res=>this.setState({rmnoCode:res.data}))
+        Taro.getStorage({ key: 'buyerId' }).then(res => { this.setState({ appid: res.data }) })
+        Taro.getStorage({ key: "getInfo" }).then(res => { this.setState({ mobile: res.data.mobile, username: res.data.userName,sex:res.data.gender}) })
         if (this.$router.params.num === '1') {
-            console.log(this.$router.params,'params')
             list = [JSON.parse(this.$router.params.info)]
-            regtion.regtion = list
-            this.setState({rmno:this.$router.params.rmno},()=>{console.log(this.state.rmno)})
+            regtion.regtionOrder = list
+            this.setState({rmno:this.$router.params.rmno})
         }
         else if (this.$router.params.num === '3') {
             list = [...list, JSON.parse(this.$router.params.info)]
@@ -84,12 +86,11 @@ export default class Registration extends Component {
             getInfo.newid=newid
             this.setState({ newid })
         }
-        this.setState({ getinfo: list, appid: this.$router.params.appid, mobile: this.$router.params.mobile, username: this.$router.params.username, rmnum: this.$router.params.rmnum, sex: this.$router.params.sex })
+        this.setState({ getinfo: list, rmnum: this.$router.params.rmnum})
         this.getPayMoney(list[0].id)
     }
     getPayMoney = (id) => {
         getmoney({ masterId: id }, (res) => {
-            console.log(res,'钱')
             if (res.data && res.data.resultCode === 0) {
                 this.setState({ money: res.data.resultInfo })
             } else {
@@ -98,13 +99,10 @@ export default class Registration extends Component {
         })
     }
     
-   
     test = () => {
-        Taro.navigateTo({ url: `/pages/add_check/add_check?info=${JSON.stringify(this.state.getinfo[0])}&appid=${this.state.appid}&sex=${this.state.sex}` })
+        Taro.navigateTo({ url:`/pages/add/add?id=${this.state.getinfo[0].id}`})
     }
  
-  
-   
     del = (value) => {
         if (value.text === '删除') {
             Taro.showModal({
@@ -133,7 +131,6 @@ export default class Registration extends Component {
     }
 
     render() {
-        Taro.getStorage({key:'rmnoCode'}).then(res=>this.setState({rmnoCode:res.data}))
         const items = [
             { 'title': '房间选择' },
             { 'title': '登记确认' },

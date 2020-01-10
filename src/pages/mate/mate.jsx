@@ -34,46 +34,47 @@ export default class Mate extends Component {
     doChange = (value) => {
         this.setState({ phone: value })
     }
-    doClick = () => {
-        if (this.state.rsvNo === this.state.mate) {
-            let gender = ''
-            if (this.state.sex === 'f') {
-                gender = '女'
-            } else {
-                gender = "男"
-            }
-            //拆分成员单
+    handle = () => {
+        let gender = ''
+        if (this.state.sex === 'f') {
+            gender = '女'
+        } else {
+            gender = "男"
+        }
+        let mobile = this.state.info.mobile.substring(7)
+        if (mobile === this.state.phone || this.state.rsvNo === this.state.mate) {
             if (this.state.info.rsvSrcId) {
                 SplitMember({
                     mobile: this.state.info.mobile,
                     rsvSrcId: this.state.info.rsvSrcId,
                     name: this.state.info.rsvMan,
-                    idNo: this.state.idcard,
+                    idNo: this.state.info.idNo,
                     sex: gender,
                     idCode: '01',
                 }, (res) => {
-                        if (res.data && res.data.resultCode === 0) {
-                            this.setState({ item: res.data.resultInfo })
-                            this.checkRoom(res.data.resultInfo.rmno, res.data.resultInfo.rmtype, res.data.resultInfo.arr, res.data.resultInfo.dep, res.data.resultInfo.id)
-                        } else {
-                            Taro.showToast({title:'请求失败',icon:'none'})
-                        }
-                   
+                    if (res.data && res.data.resultCode === 0) {
+                        console.log(res, '拆分成员单')
+                        this.setState({ item: res.data.resultInfo })
+                        this.checkRoom(res.data.resultInfo.rmno, res.data.resultInfo.rmtype, res.data.resultInfo.arr, res.data.resultInfo.dep, res.data.resultInfo.id)
+                    } else {
+                        Taro.navigateTo({
+                            url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                        })
+                    }
                 })
             } else {
                 Taro.navigateTo({
-                    url: `/pages/registration/registration?info=${JSON.stringify(this.state.info)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                    url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
                 })
             }
-           
-
-        } else{
+        } else {
             Taro.showToast({
-                title: '预订单号输入错误',
+                title: '输入错误',
                 icon: 'none'
             })
         }
     }
+   
 
     checkRoom = (rmno,roomType, startArr,endDep,id) => {
         // 查询可用房间
@@ -114,46 +115,7 @@ export default class Mate extends Component {
             }
         })
     }
-    handle = () => {
-        let gender = ''
-        if (this.state.sex === 'f') {
-            gender = '女'
-        } else {
-            gender = "男"
-        }
-        let mobile = this.state.info.mobile.substring(7)
-        if (mobile === this.state.phone) {
-            if (this.state.info.rsvSrcId) {
-                SplitMember({
-                    mobile: this.state.info.mobile,
-                    rsvSrcId: this.state.info.rsvSrcId,
-                    name: this.state.info.rsvMan,
-                    idNo: this.state.info.idNo,
-                    sex: gender,
-                    idCode: '01',
-                }, (res) => {
-                        if (res.data && res.data.resultCode === 0) {
-                            console.log(res, '拆分成员单')
-                            this.setState({item:res.data.resultInfo})
-                            this.checkRoom(res.data.resultInfo.rmno,res.data.resultInfo.rmtype,res.data.resultInfo.arr,res.data.resultInfo.dep,res.data.resultInfo.id)
-                        } else {
-                            Taro.navigateTo({
-                                url: `/pages/registration/registration?info=${JSON.stringify(this.state.info)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                            })  
-                   }
-                })
-            } else {
-                Taro.navigateTo({
-                    url: `/pages/registration/registration?info=${JSON.stringify(this.state.info)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                })
-            }
-        } else {
-            Taro.showToast({
-                title: '输入错误',
-                icon: 'none'
-            })
-        }
-    }
+   
     render() {
         Taro.getStorage({ key: 'rsvNo' }).then(res => this.setState({ rsvNo:res.data}))
         return (
@@ -196,11 +158,9 @@ export default class Mate extends Component {
                             : null
                     }
                    
-                {this.state.status === 0 ? <View style='margin:80px 20px 0 20px'>
+                <View style='margin:80px 20px 0 20px'>
                     <AtButton type='primary' onClick={this.handle}>确认匹配</AtButton>
-                </View>: <View style='margin:80px 20px 0 20px'>
-                    <AtButton type='primary' onClick={this.doClick}>确认匹配</AtButton>
-                </View>}
+                </View>
             </View>
         )
     }

@@ -1,6 +1,5 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
-import { AtCountdown } from 'taro-ui'
 import './paymentPage.scss'
 import { gettardeno, getorderstr } from '../utils/utils'
 import { getInfo, regtion} from '../utils/AppData'
@@ -16,8 +15,6 @@ export default class paymentPage extends Component {
         getinfo:null //订单信息
     }
     componentWillMount() {
-        console.log(getInfo, regtion,'哈哈')
-        console.log(this.$router.params.appid, 'pay页面')
         var getinfo = JSON.parse(this.$router.params.getinfo)
         this.setState({ appid: this.$router.params.appid,getinfo})
     }
@@ -47,7 +44,7 @@ export default class paymentPage extends Component {
             orderStr: order,
             success: (res) => {
                 if (res.result && res.memo === "") {
-                    
+                    this.success()
                 }
             },
             fail: () => {
@@ -81,8 +78,7 @@ export default class paymentPage extends Component {
             tradeNO: trade,
             success: (res) => {
                 if (res.result && res.memo === "") {
-                    order.status = 1
-                    this.list()
+                    Taro.navigateTo({ url:'/pages/success/success'})
                 }
             },
             fail: () => {
@@ -107,11 +103,6 @@ export default class paymentPage extends Component {
                 <View style='padding:30px 100px 30px 100px;background:#fff'>
                     <Text>订单总价:</Text>
                     <Text style='color:#000;fontweight:800'>￥3000</Text>
-                    <AtCountdown
-                        format={{minutes: ':', seconds: '' }}
-                        minutes={10}
-                        onTimeUp={this.onTimeUp.bind(this)}
-                    />
                 </View>
                 <View style='border-bottom:1px solid #ddd'></View>
                 <View style='padding:20px 120px 20px 120px;background:#fff'>
