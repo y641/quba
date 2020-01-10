@@ -8,11 +8,12 @@ class App extends Component {
   config = {
       pages: [
           'pages/index/index',
+          'pages/paymentpage/paymentpage',
+          'pages/registration/registration',
           'pages/checkout/checkout',
           'pages/mate/mate',
           'pages/without/without',
           'pages/order_check/order_check',
-          'pages/registration/registration',
           'pages/add_check/add_check',
           'pages/success/success',
           'pages/me/me'

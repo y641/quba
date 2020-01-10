@@ -8,6 +8,9 @@
 .at-card__header {
   display: none !important;
 }
+.at-icon{
+    line-height:0 !important;
+}
 .check{
   margin-right: 0.6rem;
 }
@@ -29,6 +32,9 @@
 .at-divider{
     height:0rem !important;
 }
+.at-float-layout--active .at-float-layout__overlay{
+    opacity: 0 !important;
+}
 .person{
   border:1px solid #666;
   width:1.2rem;
@@ -37,6 +43,17 @@
   padding:0.1rem;
   margin-left:3.9rem;
   border-radius: 0.1rem;
+}
+.at-float-layout .layout-header{
+   display: none !important;
+}
+.layout-body{
+  height: 150px !important;
+}
+.at-float-layout__container{
+    position: absolute !important;
+    bottom:52PX !important;
+    height: 200PX !important;
 }
 .line{
   border:1px solid #666;

@@ -2,7 +2,8 @@ import Taro, { Component } from '@tarojs/taro'
 import { View, Text, } from '@tarojs/components'
 import { AtSteps, AtCard, AtButton} from 'taro-ui'
 import './order_check.scss'
-import { SplitMember,noPassByMobile,noPassByName } from '../utils/utils'
+import { rmnoRoom} from '../utils/AppData'
+import { SplitMember, noPassByMobile, noPassByName, searchroom, shotgunhouse  } from '../utils/utils'
 
 export default class Order extends Component {
     config = {
@@ -23,7 +24,8 @@ export default class Order extends Component {
         sex: '',
         item: null,
         currentIndex: '-1',
-        resultInfo: null
+        resultInfo: null,
+        rmno:''
     }
     componentWillMount() {
         let list = [...JSON.parse(this.$router.params.info)]
@@ -42,9 +44,56 @@ export default class Order extends Component {
     textContent = (item, index) => {
         this.setState({ item, currentIndex: index })
     }
+    checkRoom = (rmno,id) => {
+        // 查询可用房间
+        if (rmno === '') {
+            console.log('房号为空 查询可用房间')
+            searchroom({
+                rmtype: this.state.item.rmtype,
+                arr: this.state.item.arr,
+                dep: this.state.item.dep
+            }, (res) => {
+                    console.log(res,'查询可用房间')
+                    if (res.data && res.data.resultInfo.length > 0) { // 有可用房号
+                        let roomType = res.data.resultInfo[0].rmno
+                        Taro.setStorage({ key: 'rmnoCode', data: res.data.resultInfo[0].rmno})
+                        rmnoRoom.rmnoCode = roomType
+                        console.log(rmnoRoom.rmnoCode,'rmno.rmnoRoom')
+                    this.assignRoom(res.data.resultInfo[0].rmno, id)                    
+                } else if (res.data.resultInfo.length === 0) {
+                    Taro.navigateTo({ url: '/pages/without/without' })
+                } 
+            })
+        } else {
+            // todo
+            console.log('else')
+            Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1&&rmno=${this.state.rmno}` })
+        }
+    }
+    assignRoom = (rmno,id) => {
+        console.log(id,'id')
+        shotgunhouse({
+            masterId: id,
+            rmno
+        }, (res) => {
+                console.log(res,'排房')
+                if (res.data && res.data.resultCode === 0) { // 排房成功
+                console.log(res,'排房成功')
+                    this.setState({ item: { ...this.state.item, rmno: '***' } })
+                Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1&rmno=${rmno}` })
+            } else {
+                Taro.showToast({
+                    title: '排房失败',
+                    icon: 'none'
+                })
+                return
+            }
+        })
+    }
     handle = () => {
         if (this.state.currentIndex >= 0) {
             if (this.state.item.rsvSrcId) {
+                console.log('3')
                 let gender = ''
                 this.state.sex === 'f' ? gender = '女' : gender = '男'
                 //拆分订单
@@ -56,25 +105,41 @@ export default class Order extends Component {
                     sex: gender,
                     idCode: '01'
                 }, (res) => {
+                        console.log(res,'拆分')
                         if (res.data && res.data.resultCode === 0) {
-                            Taro.navigateTo({
-                                url: `/pages/registration/registration?info=${JSON.stringify(res.data.resultInfo)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                            })
+                            this.setState({item:res.data.resultInfo})
+                            this.checkRoom(res.data.resultInfo.rmno,res.data.resultInfo.id)
                         } else {
-                            Taro.showToast({title:'请求失败',icon:'none'})
+                            Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1` })
                     }
                 })
             } else {
-                Taro.navigateTo({
-                    url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                })
+                Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1` }) 
             }
         } else {
+            console.log('4')
             Taro.showToast({
                 title: '请选择',
                 icon: 'none'
             })
         }
+    }
+
+    list = (typeRoom, arrBuffer, depBuffer) => {
+        //查询可用房间
+        searchroom({
+            rmtype: typeRoom,
+            arr: arrBuffer,
+            dep: depBuffer
+        }, (res) => {
+            if (res.data && res.data.resultInfo.length > 0) {
+             console.log(res,'查询可用房间')
+            } else if (res.data.resultInfo.length === 0) {
+                Taro.navigateTo({ url: '/pages/without/without' })
+            } else {
+                Taro.showToast({ title: '请求失败', icon: 'none' })
+            }
+        })
     }
     render() {
        
@@ -83,7 +148,6 @@ export default class Order extends Component {
             { 'title': '登记确认' },
             { 'title': '登记成功' }
         ]
-        const {mobile}=this.state
         return (
             <View className='order_check'>
                 {/* 步骤条 */}
@@ -94,8 +158,6 @@ export default class Order extends Component {
                 />
                 {/* 预定信息 */}
                 {this.state.order ? this.state.order.map((item, index) => {
-                    
-
                     return (
                         <View className='post'>
                             <AtCard
@@ -113,7 +175,7 @@ export default class Order extends Component {
                                 <View className='at-article'>入住日期：{item.arr}</View>
                                 <View className='at-article'>离店日期：{item.dep}</View>
                                 <View className='at-article'>入住房型：{item.rmtype}</View>
-                                <View className='at-article'>房间数量：共{item.rmnum}间</View>
+                                <View className='at-article'>房间数量：共1间</View>
                             </AtCard>
                         </View>
                     )
