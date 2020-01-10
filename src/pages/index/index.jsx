@@ -87,7 +87,8 @@ export default class Index extends Component {
             if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length === 0) {
                 //按照姓名查询成员单
                 this.inquiryName()
-            } else if (res.data && res.data.resultInfo.length > 0&& res.data.resultInfo[0].sta==='I') {
+            } else if (res.data && res.data.resultInfo.length > 0 && res.data.resultInfo[0].sta === 'I') {
+                Taro.hideLoading()
                 Taro.navigateTo({ url:`/pages/check_success/check_success?checksuccess=${JSON.stringify(res.data.resultInfo)}`})
             }else{
                 Taro.hideLoading()

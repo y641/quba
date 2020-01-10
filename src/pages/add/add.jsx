@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text, Picker } from '@tarojs/components'
 import { AtInput, AtForm, AtIcon, AtButton } from 'taro-ui'
-import { addperson, IdentityCodeValid } from '../utils/utils'
+import { addperson, IdentityCodeValid, getmoney} from '../utils/utils'
 import './add.scss'
 
 var info = []
@@ -17,15 +17,22 @@ export default class add extends Component {
         idCard: '',
         getinfo: null,
         id: '',
-        sex: ''
+        sex: '',
+        payMoney: "",
+        num:''
     }
     componentWillMount() {
-        // info = [...info, this.$router.params.info]
-        // let getinfo = JSON.parse(info[0])
-        // this.setState({ getinfo, appid: this.$router.params.appid, sex: this.$router.params.sex })
         console.log(this.$router.params.id, 'id')
-        this.setState({ id: this.$router.params.id})
-        Taro.getStorage({key:'getInfo'}).then(res => this.setState({ sex: res.data.gender }))
+        if (this.$router.params.id) {
+            this.setState({ id: this.$router.params.id})
+        }
+        if (this.$router.params.num) {
+            this.setState({ id: this.$router.params.id, num: this.$router.params.num})
+        }
+        if (this.$router.params.money) {
+            this.setState({ payMoney: this.$router.params.money})
+        }
+        Taro.getStorage({ key: 'getInfo' }).then(res => this.setState({ sex: res.data.gender }))
     }
     onChange = e => {
         this.setState({
@@ -79,14 +86,19 @@ export default class add extends Component {
                 mobile: this.state.mobile,
                 masterId: this.state.id
             }, (res) => {
-                console.log(res)
-                if (res.data && res.data.resultCode === 0) {
-                    Taro.navigateTo({
-                        url: `/pages/registration/registration?info=${JSON.stringify({
-                            name: this.state.name, mobile: this.state.mobile, selector: this.state.selectorChecked, idcard: this.state.idCard
-                        })}&num=3&newid=${[res.data.resultInfo]}`
-                    })
-                } else {
+                    console.log(res,'添加同住人')
+                    if (res.data && res.data.resultCode === 0) {
+                        if (this.state.num === '6') {
+                            Taro.navigateTo({ url: `/pages/check_success/check_success?num=8&checksuccess=${JSON.stringify({ name: this.state.name, mobile: this.state.mobile, selector: this.state.selectorChecked, idcard: this.state.idCard })}&newid=${res.data.resultInfo}`})
+                        } else {
+                            console.log('2222')
+                            Taro.navigateTo({
+                                url: `/pages/registration/registration?info=${JSON.stringify({
+                                    name: this.state.name, mobile: this.state.mobile, selector: this.state.selectorChecked, idcard: this.state.idCard
+                                })}&num=3&newid=${[res.data.resultInfo]}`
+                            })
+                   }
+                    } else {
                     Taro.showToast({
                         title: '请求失败',
                         icon: 'none'

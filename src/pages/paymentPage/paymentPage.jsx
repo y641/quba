@@ -12,18 +12,19 @@ export default class paymentPage extends Component {
     }
     state = {
         appid: '',
-        getinfo:null //订单信息
+        getinfo: null, //订单信息,
+        payMoney:''
     }
     componentWillMount() {
         var getinfo = JSON.parse(this.$router.params.getinfo)
-        this.setState({ appid: this.$router.params.appid,getinfo})
+        this.setState({ appid: this.$router.params.appid, getinfo, payMoney:this.$router.params.money})
     }
     getOrder(e) {
         if (e.preFreeze) {
             getorderstr({
                 masterId: this.state.getinfo[0].id,
                 subject: this.state.getinfo[0].rmtype,
-                // totalFee: this.state.money.nonPay,
+                // totalFee: this.state.payMoney,
                 totalFee: 0.01,
                 isPreFreeze: 'T',
                 buyerId: this.state.appid
@@ -61,8 +62,8 @@ export default class paymentPage extends Component {
         gettardeno({
             masterId: this.state.getinfo[0].id,
             subject: this.state.getinfo[0].rmtype,
-            totalFee: 0.01,
-            // totalFee: this.state.money.nonPay,
+            totalFee:0.01,
+            // totalFee: this.state.payMoney,
             buyerId: this.state.appid
         }, (res) => {
             if (res.data && res.data.resultCode === 0) {
@@ -102,12 +103,12 @@ export default class paymentPage extends Component {
             <View style='border-top:1px solid #ddd'>
                 <View style='padding:30px 100px 30px 100px;background:#fff'>
                     <Text>订单总价:</Text>
-                    <Text style='color:#000;fontweight:800'>￥3000</Text>
+                    <Text style='color:#000;fontweight:800'>￥{this.state.payMoney ? this.state.payMoney :null}</Text>
                 </View>
                 <View style='border-bottom:1px solid #ddd'></View>
                 <View style='padding:20px 120px 20px 120px;background:#fff'>
                     <View>还需支付</View>
-                    <View style='color:red;fontweight:800;padding-top:5px'>￥3000</View>
+                    <View style='color:red;fontweight:800;padding-top:5px'>￥{this.state.payMoney ? this.state.payMoney : null}</View>
                 </View>
                 <View style="margin:20px 10px 0 10px;">
                         <unify-pay
