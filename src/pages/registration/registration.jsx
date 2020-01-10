@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
-import { AtSteps, AtCard, AtSwipeAction, AtButton, AtDivider, AtIcon, AtFloatLayout  } from 'taro-ui'
+import { AtSteps, AtCard, AtSwipeAction, AtButton, AtDivider, AtIcon, AtFloatLayout } from 'taro-ui'
 import './registration.scss'
 import { getInfo, regtion } from '../utils/AppData'
 import { getmoney, noPassByName, noPassByMobile } from '../utils/utils'
@@ -66,27 +66,27 @@ export default class Registration extends Component {
         sex: '',
         newid: null,
         isOpened: false,
-        disabled:false,
+        disabled: false,
         orderMoney: false,
-        rmnoCode:''  //房间号
+        rmnoCode: ''  //房间号
     }
     componentWillMount() {
-         Taro.getStorage({key:'rmnoCode'}).then(res=>this.setState({rmnoCode:res.data}))
+        Taro.getStorage({ key: 'rmnoCode' }).then(res => this.setState({ rmnoCode: res.data }))
         Taro.getStorage({ key: 'buyerId' }).then(res => { this.setState({ appid: res.data }) })
-        Taro.getStorage({ key: "getInfo" }).then(res => { this.setState({ mobile: res.data.mobile, username: res.data.userName,sex:res.data.gender}) })
+        Taro.getStorage({ key: "getInfo" }).then(res => { this.setState({ mobile: res.data.mobile, username: res.data.userName, sex: res.data.gender }) })
         if (this.$router.params.num === '1') {
             list = [JSON.parse(this.$router.params.info)]
             regtion.regtionOrder = list
-            this.setState({rmno:this.$router.params.rmno})
+            this.setState({ rmno: this.$router.params.rmno })
         }
         else if (this.$router.params.num === '3') {
             list = [...list, JSON.parse(this.$router.params.info)]
-            getInfo.list=list
+            getInfo.list = list
             newid = [...newid, this.$router.params.newid]
-            getInfo.newid=newid
+            getInfo.newid = newid
             this.setState({ newid })
         }
-        this.setState({ getinfo: list, rmnum: this.$router.params.rmnum})
+        this.setState({ getinfo: list, rmnum: this.$router.params.rmnum })
         this.getPayMoney(list[0].id)
     }
     getPayMoney = (id) => {
@@ -98,11 +98,11 @@ export default class Registration extends Component {
             }
         })
     }
-    
+
     test = () => {
-        Taro.navigateTo({ url:`/pages/add/add?id=${this.state.getinfo[0].id}`})
+        Taro.navigateTo({ url: `/pages/add/add?id=${this.state.getinfo[0].id}` })
     }
- 
+
     del = (value) => {
         if (value.text === '删除') {
             Taro.showModal({
@@ -122,7 +122,7 @@ export default class Registration extends Component {
         }
     }
     statusOrder = () => {
-        this.setState({ orderMoney: !this.state.orderMoney })
+        this.setState({ orderMoney: !this.state.orderMoney }, () => { console.log(this.state.orderMoney) })
     }
 
 
@@ -130,8 +130,8 @@ export default class Registration extends Component {
         if (this.state.money.nonPay > 0) {
             Taro.navigateTo({ url: `/pages/paymentpage/paymentpage?appid=${this.state.appid}&getinfo=${JSON.stringify(this.state.getinfo)}&money=${this.state.money.nonPay}` })
         } else {
-            Taro.navigateTo({url:'/pages/check_success/check_success'})
-       }
+            Taro.navigateTo({ url: '/pages/check_success/check_success' })
+        }
     }
 
     render() {
@@ -154,7 +154,7 @@ export default class Registration extends Component {
             var week = weekDay[myDate.getDay()]
             var weekDate = weekDay[myWeek.getDay()]
             //两个日期之间的所有日期
-            var timeData = getAll(start,end)
+            var timeData = getAll(start, end)
         }
         return (
             <View>
@@ -211,7 +211,7 @@ export default class Registration extends Component {
                     }) : null}
                     <View
                         style='padding:15px;background:#fff;margin-top:165px'>
-                        <Text style='padding-left:10px;color:red'>{this.state.money.nonPay ? `￥${this.state.money.nonPay}` :null}</Text>
+                        <Text style='padding-left:10px;color:red'>{this.state.money.nonPay ? `￥${this.state.money.nonPay}` : null}</Text>
                         <Text style='padding-left:50px' onClick={this.statusOrder}>
                             明细
                             <Text>
@@ -221,29 +221,25 @@ export default class Registration extends Component {
                         <Text style='margin-left:30px;padding:5px 30px;background:rgb(97, 144, 232);border-radius:30px;color:#fff' onClick={this.
                             submitOrder}>提交订单</Text>
                     </View>
-                    {this.state.orderMoney ? (
-                        <View>
-                            <AtFloatLayout isOpened>
-                                <View style='padding:10px'>
-                                    <Text className='at-article__h2'>费用明细</Text>
-                                    <Text className='at-article__h2' style='padding-left:148px;color:red'>￥{this.state.money.rsvDeposit}</Text>
-                                </View>
-                                <AtDivider />
-                                {timeData ? timeData.map(item => {
-                                    return <View>
-                                        <View style='padding:10px 10px 0 10px'>
-                                            <Text className='at-article__h3'>{item}</Text>
-                                            <Text className='at-article__h3' style='padding-left:150px'>￥{this.state.money.rsvDeposit}</Text>
-                                        </View>
-                                    </View>
-                                }) : null}
-                                <View style='padding:10px'>
-                                    <Text className='at-article__h3'>押金</Text>
-                                    <Text className='at-article__h3' style='padding-left:196px'>￥{this.state.money.rsvDeposit}</Text>
-                                </View>
-                             </AtFloatLayout>
+                    <AtFloatLayout isOpened={this.state.orderMoney} onClose={() => { this.setState({ orderMoney: !this.state.orderMoney }) }}>
+                        <View style='padding:10px'>
+                            <Text className='at-article__h2'>费用明细</Text>
+                            <Text className='at-article__h2' style='padding-left:148px;color:red'>￥{this.state.money.rsvDeposit}</Text>
                         </View>
-                    ) : null}
+                        <AtDivider />
+                        {timeData ? timeData.map(item => {
+                            return <View>
+                                <View style='padding:10px 10px 0 10px'>
+                                    <Text className='at-article__h3'>{item}</Text>
+                                    <Text className='at-article__h3' style='padding-left:150px'>￥{this.state.money.rsvDeposit}</Text>
+                                </View>
+                            </View>
+                        }) : null}
+                        <View style='padding:10px'>
+                            <Text className='at-article__h3'>押金</Text>
+                            <Text className='at-article__h3' style='padding-left:196px'>￥{this.state.money.rsvDeposit}</Text>
+                        </View>
+                    </AtFloatLayout>
                 </View>
             </View>
         )
