@@ -53,7 +53,6 @@ export default class Mate extends Component {
                     idCode: '01',
                 }, (res) => {
                     if (res.data && res.data.resultCode === 0) {
-                        console.log(res, '拆分成员单')
                         this.setState({ item: res.data.resultInfo })
                         this.checkRoom(res.data.resultInfo.rmno, res.data.resultInfo.rmtype, res.data.resultInfo.arr, res.data.resultInfo.dep, res.data.resultInfo.id)
                     } else {
@@ -63,9 +62,9 @@ export default class Mate extends Component {
                     }
                 })
             } else {
-                Taro.navigateTo({
-                    url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
-                })
+                Taro.getStorage({ key: 'info' }).then(res => Taro.navigateTo({
+                    url: `/pages/registration/registration?info=${JSON.stringify(res.data)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1`
+                }))
             }
         } else {
             Taro.showToast({
