@@ -222,8 +222,8 @@ export default class Index extends Component {
                     <View style='position:absolute;bottom:1%;left:80%' onClick={() => {
                         Taro.navigateTo({url:'/pages/img_hotal/img_hotal'})
                     }}>
-                        <Image style='width:30px;height:30px;vertical-align:middle;' src={require('../../img/img002.png')}></Image>
-                        <Text style='margin-left:5px;color:#fff'>更多</Text>
+                        <Image style='width:25px;height:25px;vertical-align:middle;text-align:center' src={require('../../img/img002.png')}></Image>
+                        <Text style='margin-left:3px;color:#fff;vertical-align:middle;text-align:center'>更多</Text>
                     </View>
               </View>
 
