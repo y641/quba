@@ -8,6 +8,8 @@ class App extends Component {
   config = {
       pages: [
           'pages/index/index',
+          'pages/success/success',
+          'pages/img_hotal/img_hotal',
           'pages/check_success/check_success',
           'pages/add/add',
           'pages/paymentpage/paymentpage',
@@ -16,7 +18,6 @@ class App extends Component {
           'pages/mate/mate',
           'pages/without/without',
           'pages/order_check/order_check',
-          'pages/success/success',
           'pages/me/me'
     ],
     window: {

@@ -127,10 +127,10 @@ export default class Registration extends Component {
 
 
     submitOrder = () => {
-        if (this.state.money.nonPay > 0) {
+        if (this.state.money.nonPay < 0) {
             Taro.navigateTo({ url: `/pages/paymentpage/paymentpage?appid=${this.state.appid}&getinfo=${JSON.stringify(this.state.getinfo)}&money=${this.state.money.nonPay}` })
         } else {
-            Taro.navigateTo({ url: '/pages/check_success/check_success' })
+            Taro.navigateTo({ url: '/pages/success/success' })
         }
     }
 

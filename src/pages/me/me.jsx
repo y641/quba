@@ -10,7 +10,6 @@ import {
     findsubscribephone
 } from '../utils/utils'
 import './me.scss'
-import {get} from '../utils/AppData'
 
 export default class Me extends Component {
     config = {
@@ -21,12 +20,10 @@ export default class Me extends Component {
         orderinfo: null
     }
     componentWillMount() {
-        if (get.getInfo) {
-            this.setState({ getinfo: get.getInfo })
-            this.inquiryMembe(get.getInfo.certNo)
-        } else {
-            console.log('等待中')
-        }
+        Taro.getStorage({ key: 'getInfo' }).then(res => {
+            this.setState({ getinfo: res.data }),
+                () => { this.inquiryMembe(getinfo.certNo) }
+        })
     }
     //身份证号查询成员单
     inquiryMembe = (certNo) => {

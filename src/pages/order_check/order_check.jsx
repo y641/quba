@@ -47,18 +47,15 @@ export default class Order extends Component {
     checkRoom = (rmno,id) => {
         // 查询可用房间
         if (rmno === '') {
-            console.log('房号为空 查询可用房间')
             searchroom({
                 rmtype: this.state.item.rmtype,
                 arr: this.state.item.arr,
                 dep: this.state.item.dep
             }, (res) => {
-                    console.log(res,'查询可用房间')
                     if (res.data && res.data.resultInfo.length > 0) { // 有可用房号
                         let roomType = res.data.resultInfo[0].rmno
                         Taro.setStorage({ key: 'rmnoCode', data: res.data.resultInfo[0].rmno})
                         rmnoRoom.rmnoCode = roomType
-                        console.log(rmnoRoom.rmnoCode,'rmno.rmnoRoom')
                     this.assignRoom(res.data.resultInfo[0].rmno, id)                    
                 } else if (res.data.resultInfo.length === 0) {
                     Taro.navigateTo({ url: '/pages/without/without' })
@@ -69,14 +66,11 @@ export default class Order extends Component {
         }
     }
     assignRoom = (rmno,id) => {
-        console.log(id,'id')
         shotgunhouse({
             masterId: id,
             rmno
         }, (res) => {
-                console.log(res,'排房')
                 if (res.data && res.data.resultCode === 0) { // 排房成功
-                console.log(res,'排房成功')
                     this.setState({ item: { ...this.state.item, rmno: '***' } })
                 Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1&rmno=${rmno}` })
             } else {
@@ -103,7 +97,6 @@ export default class Order extends Component {
                     sex: gender,
                     idCode: '01'
                 }, (res) => {
-                        console.log(res,'拆分')
                         if (res.data && res.data.resultCode === 0) {
                             this.setState({item:res.data.resultInfo})
                             this.checkRoom(res.data.resultInfo.rmno,res.data.resultInfo.id)
@@ -115,7 +108,6 @@ export default class Order extends Component {
                 Taro.navigateTo({ url: `/pages/registration/registration?info=${JSON.stringify(this.state.item)}&sex=${this.state.sex}&appid=${this.state.appid}&idNo=${this.state.idcard}&num=1` }) 
             }
         } else {
-            console.log('4')
             Taro.showToast({
                 title: '请选择',
                 icon: 'none'
@@ -131,7 +123,6 @@ export default class Order extends Component {
             dep: depBuffer
         }, (res) => {
             if (res.data && res.data.resultInfo.length > 0) {
-             console.log(res,'查询可用房间')
             } else if (res.data.resultInfo.length === 0) {
                 Taro.navigateTo({ url: '/pages/without/without' })
             } else {
