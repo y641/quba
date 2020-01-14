@@ -46,7 +46,7 @@ export default class Index extends Component {
         info({ authCode: code },
             (res) => {
                 if (res.data && res.data.resultCode === 0) {
-                    Taro.setStorage({ key: 'buyerId', data: res.data.resultInfo.buyerId})
+                    Taro.setStorage({ key: 'buyerId', data: res.data.resultInfo.buyerId })
                     this.getinfo(res.data.resultInfo.accessToken)
                     this.setState({ appid: res.data.resultInfo.buyerId })
                 }
@@ -63,7 +63,7 @@ export default class Index extends Component {
             (res) => {
                 if (res.data && res.data.resultCode === 0) {
                     Taro.hideLoading()
-                    Taro.setStorage({ key: 'getInfo', data: res.data.resultInfo}).then(res=>{console.log(res)})
+                    Taro.setStorage({ key: 'getInfo', data: res.data.resultInfo }).then(res => { console.log(res) })
                     this.setState({ getinfo: res.data.resultInfo })
 
                 } else {
@@ -83,14 +83,14 @@ export default class Index extends Component {
     //身份证号查询成员单
     inquiryMembe = () => {
         inquiry({ idCode: '01', idNo: this.state.getinfo.certNo }, (res) => {
-            console.log(res,'身份证查询')
+            console.log(res, '身份证查询')
             if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length === 0) {
                 //按照姓名查询成员单
                 this.inquiryName()
             } else if (res.data && res.data.resultInfo.length > 0 && res.data.resultInfo[0].sta === 'I') {
                 Taro.hideLoading()
-                Taro.navigateTo({ url:`/pages/check_success/check_success?checksuccess=${JSON.stringify(res.data.resultInfo)}`})
-            }else{
+                Taro.navigateTo({ url: `/pages/check_success/check_success?checksuccess=${JSON.stringify(res.data.resultInfo)}` })
+            } else {
                 Taro.hideLoading()
                 Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&mobile=${this.state.getinfo.mobile}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.gender}` })
             }
@@ -192,45 +192,64 @@ export default class Index extends Component {
         return (
             <View className='choose_check'>
                 {/* 轮播图 */}
-                <Swiper
-                    className="swiper-container"
-                    circular
-                    indicatorDots
-                    indicatorColor='#999'
-                    indicatorActiveColor='#bf708f'
-                    autoplay>
-                    <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/4.jpg')}></Image>
-                    </SwiperItem>
-                    <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/5.jpg')}></Image>
-                    </SwiperItem>
-                    <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/6.jpg')}></Image>
-                    </SwiperItem>
-                    <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/7.jpg')}></Image>
-                    </SwiperItem>
-                    <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/8.jpg')}></Image>
-                    </SwiperItem>
-                    <SwiperItem>
-                        <Image className="swiper-img" mode="widthFix" src={require('../../img/9.jpg')}></Image>
-                    </SwiperItem>
-                </Swiper>
-                {/* 散客入住 */}
-                <View style='height:60px;background:#fff;border:1px solid #eee;border-radius:5px;margin:50px 30px 0 30px;padding:20px 0 10px 20px;position:reletive;' onClick={this.doClick}>
-                    <View className='at-article__p'
-                        style="margin:0;color:#000;font-size:20px;padding-bottom:5px">散客入住</View>
-                    <View className='at-article__p' style='margin:0;'>FIT</View>
-                    <Image style='position:absolute;bottom:188px;left:226px;height:60px;width:100px' mode="widthFix" src={require('../../img/img_01.png')}></Image>
+                <View style='position:relative'>
+                    <Swiper
+                        className="swiper-container"
+                        circular
+                        indicatorDots
+                        indicatorColor='#999'
+                        indicatorActiveColor='#bf708f'
+                        autoplay>
+                        <SwiperItem>
+                            <Image className="swiper-img" mode="widthFix" src={require('../../img/4.jpg')}></Image>
+                        </SwiperItem>
+                        <SwiperItem>
+                            <Image className="swiper-img" mode="widthFix" src={require('../../img/5.jpg')}></Image>
+                        </SwiperItem>
+                        <SwiperItem>
+                            <Image className="swiper-img" mode="widthFix" src={require('../../img/6.jpg')}></Image>
+                        </SwiperItem>
+                        <SwiperItem>
+                            <Image className="swiper-img" mode="widthFix" src={require('../../img/7.jpg')}></Image>
+                        </SwiperItem>
+                        <SwiperItem>
+                            <Image className="swiper-img" mode="widthFix" src={require('../../img/8.jpg')}></Image>
+                        </SwiperItem>
+                        <SwiperItem>
+                            <Image className="swiper-img" mode="widthFix" src={require('../../img/9.jpg')}></Image>
+                        </SwiperItem>
+                    </Swiper>
+                    <View style='position:absolute;bottom:1%;left:80%' onClick={() => {
+                        Taro.navigateTo({url:'/pages/img_hotal/img_hotal'})
+                    }}>
+                        <Image style='width:30px;height:30px;vertical-align:middle;' src={require('../../img/img002.png')}></Image>
+                        <Text style='margin-left:5px;color:#fff'>更多</Text>
+                    </View>
+              </View>
+
+                <View style='padding:0 5%;' onClick={this.doClick}>
+                    <View className='at-row at-row__justify--between' style='background:#fff;margin:20% 0 5% 0;border:1px solid #eee;border-radius:5px'>
+                        <View className='at-col at-col-5'>
+                            <View className='at-article__p'
+                                style="color:#000;font-size:20px;margin:20% 0 0  20%">散客入住</View>
+                            <View className='at-article__p' style='margin:0.1rem 0.6rem 0;font-size:18px;'>FIT</View>
+                            </View>
+                        <View className='at-col at-col-5' style='margin-left:5%'>
+                            <Image mode="widthFix" style='width:75%;' src={require('../../img/img_01.png')}></Image>
+                        </View>
+                    </View>
                 </View>
-                {/* 团队入住 */}
-                <View style='height:60px;background:#fff;border:1px solid #eee;border-radius:5px;margin:10px 30px 0 30px;padding:20px 0 10px 20px;position:reletive;'>
-                    <View className='at-article__p'
-                        style="margin:0;color:#000;font-size:20px;padding-bottom:5px">团队入住</View>
-                    <View className='at-article__p' style='margin:0;'>GROUP</View>
-                    <Image style='position:absolute;bottom:87px;left:226px;height:80px;width:100px' mode="widthFix" src={require('../../img/img_02.png')}></Image>
+                <View style='padding:0 5%;'>
+                    <View className='at-row at-row__justify--between' style='background:#fff;border:1px solid #eee;border-radius:5px'>
+                        <View className='at-col at-col-5'>
+                            <View className='at-article__p'
+                                style="color:#000;font-size:20px;margin:20% 0 0  20%">团队入住</View>
+                            <View className='at-article__p' style='margin:0.1rem 0.6rem 0;font-size:18px;'>GROUP</View>
+                        </View>
+                        <View className='at-col at-col-5'>
+                            <Image mode="widthFix" style='width:100%;' src={require('../../img/img_02.png')}></Image>
+                        </View>
+                    </View>
                 </View>
             </View>
         )

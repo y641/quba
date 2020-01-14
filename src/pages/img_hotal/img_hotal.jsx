@@ -35,30 +35,18 @@ export default class Index extends Component {
     state = { Img: null, titleImg: null, active: false, selected:0}
     componentWillMount() {
         Img({ arr: getNowTime() }, (res) => {
-            console.log(res)
-            let id = res.data.resultInfo[0].imageMaps[0].id
-            console.log(id,'id')
-            this.getImg(id)
+            console.log(res, '获取图片和标题')
+            if (res.data.resultCode === 0) {
+                res.data.resultInfo.forEach((item => {
+                    if (item.imageMaps[0] && item.imageMaps[0].id) {
+        item.imgSrc='/filedownload?id='+ item.imageMaps[0].id+'x-authorization=331bf2cb743368b4a0d01e0ac8b26332'
+                    }
+                    this.setState({titleImg:res.data.resultInfo},()=>{console.log(this.state.titleImg,'hahaha')})
+                }))
+            }
             this.setState({ Img: res.data.resultInfo })
         })
         
-    }
-    getImg = (imgId) => {
-        Taro.request({
-            header: {
-                'Content-Type': 'application/json',
-                'x-authorization': '331bf2cb743368b4a0d01e0ac8b26332',
-            },
-            url: 'https://openapidev.ipms.cn/igroup/edbg/filedownload',
-            method:'GET',
-            dataType: 'JSON',
-            data: {
-                id: imgId
-           },
-            success: res => {
-                console.log(res,'图片')
-            }
-        })
     }
     onClick = (name, active) => {
         console.log(name)
@@ -88,7 +76,7 @@ export default class Index extends Component {
                     }
                     return (
                             <AtTag
-                                name={index}
+                                name={index+''}
                                 type='primary'
                             circle
                             active={this.state.active}
