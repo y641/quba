@@ -50,8 +50,14 @@ export default class imgHotal extends Component {
     onClick = (imgSrc, roomTypeDescript, index) => {
         this.setState({ selected: imgSrc, roomTypeDescript, complete: false,currentIndex:index })
     }
-    doClick = (name) => {
+    doClick = () => {
         this.setState({ complete: true,currentIndex:-1 })
+    }
+    previewImage = (imgSrc) => {
+        my.previewImage({
+            current:0,
+            urls: [imgSrc]
+        });
     }
     render() {
         return (
@@ -67,24 +73,26 @@ export default class imgHotal extends Component {
                 </AtTag>
                 {this.state.Img ? this.state.Img && this.state.Img.map((item, index) => {
                     return (
-                        <AtTag
-                            name={index + ''}
-                            type='primary'
-                            circle
-                            active={index===this.state.currentIndex}
-                            onClick={this.onClick.bind(this, item.imgSrc, item.roomTypeDescript,index)}
-                        >
-                            {item.roomTypeDescript}
-                        </AtTag>
+                            <Text>
+                                <AtTag
+                                    name={index + ''}
+                                    type='primary'
+                                    circle
+                                    active={index === this.state.currentIndex}
+                                    onClick={this.onClick.bind(this, item.imgSrc, item.roomTypeDescript, index)}
+                                >
+                                    {item.roomTypeDescript}
+                                </AtTag>
+                           </Text>
                     )
                 }) : null}
                 {this.state.complete ? this.state.Img.map((item, index) => {
                     return (
-                        <View>
-                            <Text style='padding:10px 20px;font-size:20px'>{item.roomTypeDescript}</Text>
-                            <View style='padding:5px'>
-                                <Image style='width:50%' src={item.imgSrc}></Image>
+                        <View style='padding:5px'>
+                            <View>
+                                {item.roomTypeDescript}
                             </View>
+                            <Image style='width:50%' src={item.imgSrc} onClick={this.previewImage.bind(this, item.imgSrc)}></Image>
                         </View>
                     )
                 })
