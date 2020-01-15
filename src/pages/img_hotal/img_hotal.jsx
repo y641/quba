@@ -1,8 +1,9 @@
-import Taro, { Component, chooseInvoiceTitle } from '@tarojs/taro'
+import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { Img } from '../utils/utils'
 import { AtTag } from 'taro-ui'
 import './img_hotal.scss'
+import "taro-ui/dist/style/components/flex.scss"
 
 
 function getNowTime() {
@@ -28,65 +29,71 @@ function getNowTime() {
     var nowTime = myDate.getFullYear() + '-' + add_10(myDate.getMonth()) + '-' + myDate.getDate() + ' ' + add_10(myDate.getHours()) + ':' + add_10(myDate.getMinutes()) + ':' + add_10(myDate.getSeconds());
     return nowTime;
 }
-export default class Index extends Component {
+export default class imgHotal extends Component {
     config = {
         navigationBarTitleText: '酒店介绍',
     }
-    state = { Img: null, titleImg: null, active: false, selected:0}
+    state = { Img: null, titleImg: null, active: true, selected: '', roomTypeDescript: '', complete: true,currentIndex:-1 }
     componentWillMount() {
         Img({ arr: getNowTime() }, (res) => {
-            console.log(res, '获取图片和标题')
             if (res.data.resultCode === 0) {
                 res.data.resultInfo.forEach((item => {
                     if (item.imageMaps[0] && item.imageMaps[0].id) {
-        item.imgSrc='/filedownload?id='+ item.imageMaps[0].id+'x-authorization=331bf2cb743368b4a0d01e0ac8b26332'
+                        item.imgSrc = "https://openapidev.ipms.cn/igroup/edbg/filedownload?id=" + item.imageMaps[0].id + '&x-authorization=331bf2cb743368b4a0d01e0ac8b26332'
                     }
-                    this.setState({titleImg:res.data.resultInfo},()=>{console.log(this.state.titleImg,'hahaha')})
+                    this.setState({ Img: res.data.resultInfo }, () => { console.log(this.state.Img, '获取图片') })
                 }))
             }
-            this.setState({ Img: res.data.resultInfo })
         })
-        
+
     }
-    onClick = (name, active) => {
-        console.log(name)
-        this.setState({ selected: name.name });
+    onClick = (imgSrc, roomTypeDescript, index) => {
+        this.setState({ selected: imgSrc, roomTypeDescript, complete: false,currentIndex:index })
+    }
+    doClick = (name) => {
+        this.setState({ complete: true,currentIndex:-1 })
     }
     render() {
-        if (this.state.Img) {
-            const img = this.state.Img.map(element => {
-                return element.roomTypeDescript
-            });
-
-        }
         return (
             <View>
-                {this.state.Img ? this.state.Img.map((item,index) => {
-                    if (index === 0) {
-                        return (
-                            <AtTag
-                                name='tag-1'
-                                type='primary'
-                                circle
-                                onClick={this.onClick}
-                            >
-                                全部
-                            </AtTag>
-                        )
-                    }
+                <AtTag
+                    name='tag-1'
+                    type='primary'
+                    circle
+                    active={this.state.currentIndex===-1}
+                    onClick={this.doClick}
+                >
+                    全部
+                </AtTag>
+                {this.state.Img ? this.state.Img && this.state.Img.map((item, index) => {
                     return (
-                            <AtTag
-                                name={index+''}
-                                type='primary'
+                        <AtTag
+                            name={index + ''}
+                            type='primary'
                             circle
-                            active={this.state.active}
-                                onClick={this.onClick}
-                            >
-                                {item.roomTypeDescript}
-                            </AtTag>
+                            active={index===this.state.currentIndex}
+                            onClick={this.onClick.bind(this, item.imgSrc, item.roomTypeDescript,index)}
+                        >
+                            {item.roomTypeDescript}
+                        </AtTag>
                     )
                 }) : null}
-                <View> {this.state.selected}</View>
+                {this.state.complete ? this.state.Img.map((item, index) => {
+                    return (
+                        <View>
+                            <Text style='padding:10px 20px;font-size:20px'>{item.roomTypeDescript}</Text>
+                            <View style='padding:5px'>
+                                <Image style='width:50%' src={item.imgSrc}></Image>
+                            </View>
+                        </View>
+                    )
+                })
+                    : <View>
+                        <Text style='padding:10px 20px;font-size:20px'>{this.state.roomTypeDescript}</Text>
+                        <View style='padding:5px'>
+                            <Image style='width:100%' src={this.state.selected}></Image>
+                        </View>
+                    </View>}
             </View>
         )
     }

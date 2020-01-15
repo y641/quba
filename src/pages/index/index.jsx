@@ -28,7 +28,7 @@ export default class Index extends Component {
         my.getAuthCode({
             scopes: 'auth_user',
             success: (res) => {
-                Taro.showLoading({ title: '获取信息中...' })
+                Taro.showLoading({ title: '加载中' })
                 this.mebme(res.authCode)
             },
             fail: () => {
@@ -46,6 +46,7 @@ export default class Index extends Component {
         info({ authCode: code },
             (res) => {
                 if (res.data && res.data.resultCode === 0) {
+                    Taro.hideLoading()
                     Taro.setStorage({ key: 'buyerId', data: res.data.resultInfo.buyerId })
                     this.getinfo(res.data.resultInfo.accessToken)
                     this.setState({ appid: res.data.resultInfo.buyerId })
@@ -62,11 +63,11 @@ export default class Index extends Component {
             { accessToken: token },
             (res) => {
                 if (res.data && res.data.resultCode === 0) {
-                    Taro.hideLoading()
-                    Taro.setStorage({ key: 'getInfo', data: res.data.resultInfo }).then(res => { console.log(res) })
+                    Taro.setStorage({ key: 'getInfo', data: res.data.resultInfo })
                     this.setState({ getinfo: res.data.resultInfo })
-
+                    Taro.hideLoading()
                 } else {
+                    Taro.hideLoading()
                     Taro.showToast({
                         title: '获取信息失败',
                         icon: 'none'
@@ -187,6 +188,10 @@ export default class Index extends Component {
             title: '匹配中'
         })
         this.inquiryMembe()
+    }
+    componentDidHide() {
+        Taro.hideLoading()
+        this.getCode()
     }
     render() {
         return (
