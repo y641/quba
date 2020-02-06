@@ -41,7 +41,7 @@ export default class imgHotal extends Component {
                     if (item.imageMaps[0] && item.imageMaps[0].id) {
                         item.imgSrc = "https://openapidev.ipms.cn/igroup/edbg/filedownload?id=" + item.imageMaps[0].id + '&x-authorization=331bf2cb743368b4a0d01e0ac8b26332'
                     }
-                    this.setState({ Img: res.data.resultInfo }, () => { console.log(this.state.Img, '获取图片') })
+                    this.setState({ Img: res.data.resultInfo })
                 }))
             }
         })
@@ -92,7 +92,7 @@ export default class imgHotal extends Component {
                             <View>
                                 {item.roomTypeDescript}
                             </View>
-                            <Image style='width:50%' src={item.imgSrc} onClick={this.previewImage.bind(this, item.imgSrc)}></Image>
+                            <Image style='width:100%' src={item.imgSrc} onClick={this.previewImage.bind(this, item.imgSrc)}></Image>
                         </View>
                     )
                 })

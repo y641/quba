@@ -84,12 +84,12 @@ export default class Index extends Component {
     //身份证号查询成员单
     inquiryMembe = () => {
         inquiry({ idCode: '01', idNo: this.state.getinfo.certNo }, (res) => {
-            console.log(res, '身份证查询')
             if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length === 0) {
                 //按照姓名查询成员单
                 this.inquiryName()
             } else if (res.data && res.data.resultInfo.length > 0 && res.data.resultInfo[0].sta === 'I') {
                 Taro.hideLoading()
+                console.log(res,'订单查询')
                 Taro.navigateTo({ url: `/pages/check_success/check_success?checksuccess=${JSON.stringify(res.data.resultInfo)}` })
             } else {
                 Taro.hideLoading()
@@ -138,6 +138,7 @@ export default class Index extends Component {
         }, (res) => {
             if (res.data && res.data.resultCode === 0 && res.data.resultInfo.length > 0) {
                 //按照身份证查询到预定单 ,查询到预订单
+                console.log(res,'====')
                 Taro.hideLoading()
                 Taro.navigateTo({ url: `/pages/order_check/order_check?info=${JSON.stringify(res.data.resultInfo)}&appid=${this.state.appid}&username=${this.state.getinfo.userName}&idcard=${this.state.getinfo.certNo}&sex=${this.state.getinfo.gender}` })
             } else {
